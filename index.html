@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Audience Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #e2ddd7;
+    --border2: #ccc8c1;
+    --text: #1a1814;
+    --text2: #6b6560;
+    --text3: #9b9590;
+    --accent: #fe2c55;
+    --accent-bg: #fff0f3;
+    --accent-text: #c4002a;
+    --over: #0a6640;
+    --over-bg: #edf7f1;
+    --over-text: #0a6640;
+    --under: #9b3300;
+    --under-bg: #fdf2ed;
+    --under-text: #9b3300;
+    --par-bg: #f0ede8;
+    --par-text: #6b6560;
+    --radius: 12px;
+    --radius-sm: 7px;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tiktok-logo {
+    width: 28px;
+    height: 28px;
+    background: #000;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .tiktok-logo svg { width: 18px; height: 18px; }
+  .header-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .header-meta {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  /* ─── Layout ─── */
+  .layout {
+    display: flex;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  .sidebar-section {
+    padding: 0 16px 20px;
+  }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+  .region-group { margin-bottom: 6px; }
+  .region-header {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 6px 8px 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .region-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-global { background: #888; }
+  .dot-ams { background: #2563eb; }
+  .dot-eu { background: #7c3aed; }
+  .dot-apac { background: #059669; }
+  .dot-metap { background: #d97706; }
+
+  .market-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 7px 8px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-family: var(--font);
+    font-size: 13.5px;
+    color: var(--text2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .market-btn:hover { background: var(--surface2); color: var(--text); }
+  .market-btn.active {
+    background: #fff0f3;
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+
+  /* ─── Main ─── */
+  .main {
+    flex: 1;
+    padding: 28px 32px;
+    max-width: 960px;
+  }
+
+  /* ─── Market Hero ─── */
+  .market-hero {
+    margin-bottom: 24px;
+  }
+  .market-name {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .market-region-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--text3);
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  /* ─── About panel ─── */
+  .about-panel {
+    display: none;
+    padding: 0 0 40px;
+  }
+  .about-panel.visible { display: block; }
+  .about-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .about-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .about-section-title svg { color: var(--text3); flex-shrink: 0; }
+  .about-h2 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .about-p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .about-p:last-child { margin-bottom: 0; }
+  .about-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .about-ul li {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+    padding-left: 18px;
+    position: relative;
+  }
+  .about-ul li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    color: var(--text2);
+  }
+  .about-ul li strong { color: var(--text); font-weight: 600; }
+  .about-ul li a, .about-p a {
+    color: var(--accent-text);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+  }
+  .about-ul li a:hover, .about-p a:hover { opacity: .75; }
+  .about-tag {
+    display: inline-block;
+    background: var(--over-bg);
+    color: var(--over-text);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .about-warn-tag {
+    background: var(--under-bg);
+    color: var(--under-text);
+  }
+  .about-example {
+    background: var(--surface2);
+    border-left: 3px solid var(--border2);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    margin: 8px 0;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .about-grid-card {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .about-grid-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .about-grid-card-body {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ─── Sidebar about btn ─── */
+  .about-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .12s;
+    text-align: left;
+  }
+  .about-btn:hover { background: var(--surface2); border-color: var(--border2); color: var(--text); }
+  .about-btn.active { background: var(--surface2); border-color: var(--border2); color: var(--text); font-weight: 500; }
+
+  /* ─── Topic tabs ─── */
+  .topic-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .topic-tab {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .12s;
+    white-space: nowrap;
+  }
+  .topic-tab:hover { border-color: var(--border2); color: var(--text); }
+  .topic-tab.active {
+    background: var(--text);
+    border-color: var(--text);
+    color: #fff;
+  }
+
+  /* ─── Controls bar ─── */
+  .controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+    max-width: 300px;
+  }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    padding: 8px 10px 8px 32px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .search-input:focus { border-color: var(--border2); }
+  .search-input::placeholder { color: var(--text3); }
+
+  .sort-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text2);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .results-count {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--mono);
+    margin-left: auto;
+  }
+
+  /* ─── Stat cards ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .stat-card:hover {
+    border-color: var(--border2);
+    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  }
+  .stat-card:hover .copy-hint { opacity: 1; }
+  .copy-hint {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text3);
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text3);
+  }
+  .stat-pct-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .stat-pct {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    font-family: var(--mono);
+    line-height: 1;
+  }
+  .stat-pct-suffix {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+  .stat-sentence {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.4;
+  }
+  .stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    align-self: flex-start;
+  }
+  .badge-more { background: var(--over-bg); color: var(--over-text); }
+  .badge-less { background: var(--under-bg); color: var(--under-text); }
+  .badge-par { background: var(--par-bg); color: var(--par-text); }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--text);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 18px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: all .2s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── Empty ─── */
+  .empty {
+    grid-column: 1/-1;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--text3);
+    font-size: 14px;
+  }
+
+  /* ─── Section divider ─── */
+  .section-divider {
+    grid-column: 1/-1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0 4px;
+    margin-top: 4px;
+  }
+  .section-divider:first-child { padding-top: 0; }
+  .section-divider-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+  .section-divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-count {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 16px; }
+    .about-grid { grid-template-columns: 1fr; }
+    .header { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="tiktok-logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.79a8.18 8.18 0 0 0 4.78 1.52V6.86a4.85 4.85 0 0 1-1.01-.17z" fill="white"/>
+      </svg>
+    </div>
+    <span class="header-title">Audience Insights</span>
+  </div>
+  <span class="header-meta">Q1 2026 · GWI · TikTok users 18+</span>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <button class="about-btn" id="about-btn" onclick="toggleAbout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        About this data
+      </button>
+      <div class="sidebar-label">Markets</div>
+      <div id="market-list"></div>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div class="about-panel" id="about-panel">
+      <div class="about-section">
+        <div class="about-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Background &amp; purpose
+        </div>
+        <p class="about-p">The <strong>Brand Insights &amp; Analytics Global Stat Pack</strong> offers reliable, representative insights cleared for external sharing. Use these to build data-driven comms pitches or help Marketing understand TikTok user attitudes — with concrete numbers rather than generalizations.</p>
+        <p class="about-p">For example: instead of saying "TikTok users are passionate about beauty," you can say "<em>X% of TikTok users are interested in beauty — and they're Nx more likely to say so than non-users.</em>"</p>
+        <p class="about-p">All insights are pulled from <strong>GWI (GlobalWebIndex)</strong> and updated on a yearly basis.</p>
+      </div>
+
+      <div class="about-section">
+        <div class="about-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          What is GWI?
+        </div>
+        <p class="about-p">GWI (GlobalWebIndex) is an audience research company that fields surveys quarterly across 50+ countries to understand consumer attitudes and behaviors. It also collects self-reported demographic data including age, gender, and household composition.</p>
+        <div class="about-grid">
+          <div class="about-grid-card">
+            <div class="about-grid-card-title">Scale &amp; reach</div>
+            <div class="about-grid-card-body">Surveys internet users across 50+ countries in their local language</div>
+          </div>
+          <div class="about-grid-card">
+            <div class="about-grid-card-title">Consistent fielding</div>
+            <div class="about-grid-card-body">Most questions asked quarterly over several years — enabling trend analysis</div>
+          </div>
+          <div class="about-grid-card">
+            <div class="about-grid-card-title">Representative samples</div>
+            <div class="about-grid-card-body">Uses quotas and weights to ensure representative online samples</div>
+          </div>
+          <div class="about-grid-card">
+            <div class="about-grid-card-title">Breadth of topics</div>
+            <div class="about-grid-card-body">Covers attitudes, interests, sports, lifestyle, social media, devices, and more</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <div class="about-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          How to use these data
+        </div>
+        <ul class="about-ul">
+          <li><span class="about-tag">✓ OK to share</span><br>You <strong>can share</strong> individual metrics publicly with press and in external-facing materials.</li>
+          <li><span class="about-warn-tag about-tag">✗ Do not share</span><br><strong>Do not share docs in full</strong> externally — not even just your country's section. This is an internal reference for when you need a specific metric or package of metrics.</li>
+          <li><strong>Always review data</strong> before sharing to ensure it supports a positive external narrative and won't present brand risk. Examples of what to avoid:
+            <div class="about-example">❌ Sharing "60% of TikTok users are interested in healthy eating" if facing SkinnyTok allegations</div>
+            <div class="about-example">❌ Sharing "23% of TikTok users like reading" if it sounds like users aren't literary/educated</div>
+          </li>
+          <li><strong>Reframing is fine.</strong> Turn a percentage into a more compelling talking point:
+            <div class="about-example">"16% of TikTok users" → <strong>"1 in 6 TikTok users"</strong></div>
+            <div class="about-example">"32% of TikTok users" → <strong>"one third of TikTok users"</strong></div>
+          </li>
+          <li><strong>Review markets individually.</strong> Cultural variations affect how positively or negatively people respond — cross-market comparisons can be misleading.</li>
+          <li><strong>Data shared externally must be 18+.</strong> Although GWI offers 16+ data, external use requires 18+. Consult Brand Insights &amp; Analytics if &lt;18 data is needed for internal planning.</li>
+          <li><strong>Cite the data:</strong> All data comes from GWI, a third-party research database (subscription tool — not TikTok proprietary data). Results are based on Q1–Q4 2025 reports.
+            <div class="about-example"><strong>Sample citation:</strong> GWI, Q1–Q4 2025. [Market] respondents, age 18+. TikTok users are defined based on self-reported usage of monthly or greater frequency.</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="about-section">
+        <div class="about-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Data coverage
+        </div>
+        <p class="about-p"><em>Last updated: May 2026</em></p>
+        <ul class="about-ul">
+          <li><strong>Localized data:</strong> Localized questions are limited to their respective markets (e.g. Gaelic football for Ireland).</li>
+          <li><strong>Prioritization:</strong> The Stat Pack is being rolled out in A+ markets first, but deep dives for other regions are available via the <a href="https://bytedance.us.larkoffice.com/share/base/form/shrusIdGXbiDNS2P1bqW6Mmv8p7" target="_blank">intake form</a>.</li>
+          <li>We are continually adding new countries and aim to have all available markets completed by end of Q2.</li>
+        </ul>
+        <p class="about-p" style="margin-top:14px">Have questions or need a deeper dive? Use the <a href="https://bytedance.us.larkoffice.com/share/base/form/shrusIdGXbiDNS2P1bqW6Mmv8p7" target="_blank">Ask Comms Insights intake form</a> — we can provide additional metrics such as travel frequency, preferred destinations, trip planning behavior, or audience cuts like female sports fans.</p>
+      </div>
+    </div>
+
+    <div id="data-view">
+    <div class="market-hero">
+      <div class="market-name" id="market-name">Global</div>
+      <div class="market-region-badge" id="market-region-badge">
+        <span class="region-dot dot-global" id="region-dot"></span>
+        <span id="region-label">Global</span>
+      </div>
+    </div>
+
+    <div class="topic-tabs" id="topic-tabs">
+      <button class="topic-tab active" data-topic="all">All topics</button>
+      <button class="topic-tab" data-topic="Sports">⚽ Sports</button>
+      <button class="topic-tab" data-topic="Food &amp; drink">🍽 Food & drink</button>
+      <button class="topic-tab" data-topic="Music &amp; entertainment">🎵 Music & entertainment</button>
+      <button class="topic-tab" data-topic="Lifestyle &amp; hobbies">✨ Lifestyle</button>
+      <button class="topic-tab" data-topic="Travel &amp; culture">✈️ Travel & culture</button>
+    </div>
+
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" id="search-input" placeholder="Search stats…">
+      </div>
+      <select class="sort-select" id="sort-select">
+        <option value="default">Default order</option>
+        <option value="pct-desc">Highest % first</option>
+        <option value="pct-asc">Lowest % first</option>
+        <option value="index-desc">Most over-indexed first</option>
+      </select>
+      <span class="results-count" id="results-count"></span>
+    </div>
+
+    <div class="stats-grid" id="stats-grid"></div>
+    </div><!-- /data-view -->
+  </main>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard ✓</div>
+
+<script>
+const DATA = {"Austria":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":21,"idx":1.5},{"label":"American football","verb":"follow","pct":18,"idx":1.6},{"label":"athletics","verb":"follow","pct":14,"idx":1.0},{"label":"badminton","verb":"follow","pct":7,"idx":2.2},{"label":"baseball","verb":"follow","pct":6,"idx":2.7},{"label":"basketball","verb":"follow","pct":23,"idx":2.2},{"label":"boxing","verb":"follow","pct":19,"idx":2.3},{"label":"cricket","verb":"follow","pct":1,"idx":1.6},{"label":"cycling","verb":"follow","pct":22,"idx":1.1},{"label":"field hockey","verb":"follow","pct":2,"idx":2.7},{"label":"golf","verb":"follow","pct":14,"idx":1.8},{"label":"gymnastics","verb":"follow","pct":12,"idx":1.5},{"label":"handball","verb":"follow","pct":12,"idx":1.3},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":1.5},{"label":"ice hockey","verb":"follow","pct":16,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.2},{"label":"martial arts","verb":"follow","pct":16,"idx":2.3},{"label":"motor sports (e.g. F1)","verb":"follow","pct":41,"idx":1.2},{"label":"netball","verb":"follow","pct":1,"idx":3.2},{"label":"polo","verb":"follow","pct":1,"idx":1.7},{"label":"rowing","verb":"follow","pct":3,"idx":1.4},{"label":"rugby","verb":"follow","pct":4,"idx":1.4},{"label":"sailing","verb":"follow","pct":6,"idx":1.3},{"label":"skateboarding","verb":"follow","pct":6,"idx":2.0},{"label":"soccer","verb":"follow","pct":71,"idx":1.2},{"label":"surfing","verb":"follow","pct":7,"idx":2.3},{"label":"swimming / diving","verb":"follow","pct":20,"idx":1.3},{"label":"table tennis","verb":"follow","pct":12,"idx":1.5},{"label":"tennis","verb":"follow","pct":36,"idx":1.2},{"label":"triathlon","verb":"follow","pct":5,"idx":1.1},{"label":"volleyball","verb":"follow","pct":12,"idx":2.1},{"label":"winter sports","verb":"follow","pct":47,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":13,"idx":2.2},{"label":"squash","verb":"follow","pct":2,"idx":1.3},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":46,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":28,"idx":0.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.1},{"label":"eating out","verb":"interest","pct":47,"idx":1.0},{"label":"food & drink","verb":"interest","pct":65,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":65,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":54,"idx":1.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":38,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":39,"idx":1.2},{"label":"charities / volunteering","verb":"interest","pct":14,"idx":1.0},{"label":"DIY / home improvements","verb":"interest","pct":32,"idx":1.0},{"label":"fashion","verb":"interest","pct":36,"idx":1.6},{"label":"fitness & exercise","verb":"interest","pct":45,"idx":1.0},{"label":"pets / pet care","verb":"interest","pct":40,"idx":1.2},{"label":"skincare","verb":"interest","pct":39,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":26,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":31,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":39,"idx":0.9},{"label":"travel","verb":"interest","pct":56,"idx":1.0}]}},"Belgium":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":19,"idx":1.4},{"label":"American football","verb":"follow","pct":12,"idx":2.7},{"label":"athletics","verb":"follow","pct":22,"idx":0.9},{"label":"badminton","verb":"follow","pct":8,"idx":1.9},{"label":"baseball","verb":"follow","pct":6,"idx":3.1},{"label":"basketball","verb":"follow","pct":30,"idx":1.6},{"label":"boxing","verb":"follow","pct":20,"idx":2.8},{"label":"cricket","verb":"follow","pct":2,"idx":2.4},{"label":"cycling","verb":"follow","pct":34,"idx":0.8},{"label":"field hockey","verb":"follow","pct":5,"idx":0.9},{"label":"golf","verb":"follow","pct":11,"idx":1.9},{"label":"gymnastics","verb":"follow","pct":16,"idx":1.3},{"label":"handball","verb":"follow","pct":6,"idx":2.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":7,"idx":1.7},{"label":"ice hockey","verb":"follow","pct":6,"idx":2.2},{"label":"long-distance running","verb":"follow","pct":5,"idx":1.0},{"label":"martial arts","verb":"follow","pct":16,"idx":2.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":32,"idx":1.5},{"label":"netball","verb":"follow","pct":1,"idx":3.5},{"label":"polo","verb":"follow","pct":2,"idx":2.9},{"label":"rowing","verb":"follow","pct":3,"idx":1.4},{"label":"rugby","verb":"follow","pct":8,"idx":1.5},{"label":"sailing","verb":"follow","pct":3,"idx":1.2},{"label":"skateboarding","verb":"follow","pct":4,"idx":2.6},{"label":"soccer","verb":"follow","pct":71,"idx":1.3},{"label":"surfing","verb":"follow","pct":6,"idx":3.2},{"label":"swimming / diving","verb":"follow","pct":19,"idx":1.7},{"label":"table tennis","verb":"follow","pct":8,"idx":1.9},{"label":"tennis","verb":"follow","pct":36,"idx":1.1},{"label":"triathlon","verb":"follow","pct":5,"idx":1.1},{"label":"volleyball","verb":"follow","pct":10,"idx":1.5},{"label":"winter sports","verb":"follow","pct":27,"idx":1.2},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":12,"idx":3.0},{"label":"squash","verb":"follow","pct":2,"idx":1.7},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":43,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":21,"idx":1.1}],"Food & drink":[{"label":"cooking","verb":"interest","pct":54,"idx":1.2},{"label":"eating out","verb":"interest","pct":54,"idx":1.0},{"label":"food & drink","verb":"interest","pct":49,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":64,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":56,"idx":1.3}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":36,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":25,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":17,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":30,"idx":1.0},{"label":"fashion","verb":"interest","pct":32,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":36,"idx":1.4},{"label":"pets / pet care","verb":"interest","pct":42,"idx":1.2},{"label":"skincare","verb":"interest","pct":38,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":17,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":26,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":36,"idx":1.0},{"label":"travel","verb":"interest","pct":56,"idx":1.1}]}},"Bulgaria":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":17,"idx":1.4},{"label":"American football","verb":"follow","pct":7,"idx":1.6},{"label":"athletics","verb":"follow","pct":26,"idx":1.1},{"label":"badminton","verb":"follow","pct":5,"idx":1.8},{"label":"baseball","verb":"follow","pct":3,"idx":1.5},{"label":"basketball","verb":"follow","pct":30,"idx":1.3},{"label":"boxing","verb":"follow","pct":27,"idx":1.6},{"label":"cricket","verb":"follow","pct":1,"idx":1.2},{"label":"cycling","verb":"follow","pct":13,"idx":1.1},{"label":"field hockey","verb":"follow","pct":1,"idx":0.9},{"label":"golf","verb":"follow","pct":9,"idx":1.6},{"label":"gymnastics","verb":"follow","pct":21,"idx":1.1},{"label":"handball","verb":"follow","pct":4,"idx":1.8},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":1.5},{"label":"ice hockey","verb":"follow","pct":6,"idx":1.3},{"label":"long-distance running","verb":"follow","pct":5,"idx":1.3},{"label":"martial arts","verb":"follow","pct":14,"idx":1.6},{"label":"motor sports (e.g. F1)","verb":"follow","pct":31,"idx":1.2},{"label":"netball","verb":"follow","pct":1,"idx":1.0},{"label":"polo","verb":"follow","pct":1,"idx":1.0},{"label":"rowing","verb":"follow","pct":5,"idx":1.4},{"label":"rugby","verb":"follow","pct":3,"idx":1.4},{"label":"sailing","verb":"follow","pct":2,"idx":1.1},{"label":"skateboarding","verb":"follow","pct":2,"idx":1.2},{"label":"soccer","verb":"follow","pct":67,"idx":1.1},{"label":"surfing","verb":"follow","pct":3,"idx":1.2},{"label":"swimming / diving","verb":"follow","pct":12,"idx":1.4},{"label":"table tennis","verb":"follow","pct":12,"idx":1.7},{"label":"tennis","verb":"follow","pct":36,"idx":1.1},{"label":"triathlon","verb":"follow","pct":2,"idx":1.2},{"label":"volleyball","verb":"follow","pct":29,"idx":1.1},{"label":"winter sports","verb":"follow","pct":29,"idx":1.1},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":14,"idx":1.7},{"label":"squash","verb":"follow","pct":0,"idx":0.3},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":34,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":22,"idx":1.0}],"Food & drink":[{"label":"cooking","verb":"interest","pct":53,"idx":1.2},{"label":"eating out","verb":"interest","pct":29,"idx":1.3},{"label":"food & drink","verb":"interest","pct":54,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":60,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":58,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":42,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":36,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":18,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":44,"idx":1.0},{"label":"fashion","verb":"interest","pct":29,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":33,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":39,"idx":1.2},{"label":"skincare","verb":"interest","pct":37,"idx":1.4}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":13,"idx":1.0},{"label":"museums / galleries","verb":"interest","pct":23,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":32,"idx":1.0},{"label":"travel","verb":"interest","pct":56,"idx":1.0}]}},"Croatia":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":22,"idx":1.3},{"label":"American football","verb":"follow","pct":8,"idx":1.4},{"label":"athletics","verb":"follow","pct":27,"idx":0.9},{"label":"badminton","verb":"follow","pct":5,"idx":1.5},{"label":"baseball","verb":"follow","pct":4,"idx":1.2},{"label":"basketball","verb":"follow","pct":37,"idx":1.2},{"label":"boxing","verb":"follow","pct":22,"idx":1.3},{"label":"cricket","verb":"follow","pct":1,"idx":2.3},{"label":"cycling","verb":"follow","pct":14,"idx":1.2},{"label":"field hockey","verb":"follow","pct":1,"idx":1.5},{"label":"golf","verb":"follow","pct":5,"idx":1.5},{"label":"gymnastics","verb":"follow","pct":16,"idx":1.0},{"label":"handball","verb":"follow","pct":52,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":3,"idx":1.9},{"label":"ice hockey","verb":"follow","pct":7,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":4,"idx":1.2},{"label":"martial arts","verb":"follow","pct":29,"idx":1.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":30,"idx":1.1},{"label":"netball","verb":"follow","pct":0,"idx":1.5},{"label":"polo","verb":"follow","pct":1,"idx":2.0},{"label":"rowing","verb":"follow","pct":6,"idx":0.8},{"label":"rugby","verb":"follow","pct":2,"idx":1.2},{"label":"sailing","verb":"follow","pct":3,"idx":1.1},{"label":"skateboarding","verb":"follow","pct":3,"idx":1.5},{"label":"soccer","verb":"follow","pct":80,"idx":1.1},{"label":"surfing","verb":"follow","pct":3,"idx":1.5},{"label":"swimming / diving","verb":"follow","pct":17,"idx":1.1},{"label":"table tennis","verb":"follow","pct":6,"idx":1.2},{"label":"tennis","verb":"follow","pct":35,"idx":1.0},{"label":"triathlon","verb":"follow","pct":2,"idx":0.9},{"label":"volleyball","verb":"follow","pct":12,"idx":1.5},{"label":"winter sports","verb":"follow","pct":38,"idx":1.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":7,"idx":2.0},{"label":"squash","verb":"follow","pct":1,"idx":1.0},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":58,"idx":1.0},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":24,"idx":0.9}],"Food & drink":[{"label":"cooking","verb":"interest","pct":58,"idx":1.1},{"label":"eating out","verb":"interest","pct":34,"idx":1.3},{"label":"food & drink","verb":"interest","pct":63,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":66,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":58,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":37,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":34,"idx":1.2},{"label":"charities / volunteering","verb":"interest","pct":20,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":52,"idx":1.0},{"label":"fashion","verb":"interest","pct":30,"idx":1.4},{"label":"fitness & exercise","verb":"interest","pct":37,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":44,"idx":1.1},{"label":"skincare","verb":"interest","pct":41,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":24,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":28,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":39,"idx":1.0},{"label":"travel","verb":"interest","pct":56,"idx":1.1}]}},"Czech Republic":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":20,"idx":1.3},{"label":"American football","verb":"follow","pct":15,"idx":2.6},{"label":"athletics","verb":"follow","pct":27,"idx":0.9},{"label":"badminton","verb":"follow","pct":7,"idx":1.8},{"label":"baseball","verb":"follow","pct":8,"idx":2.3},{"label":"basketball","verb":"follow","pct":28,"idx":1.7},{"label":"boxing","verb":"follow","pct":22,"idx":3.6},{"label":"cricket","verb":"follow","pct":1,"idx":2.8},{"label":"cycling","verb":"follow","pct":27,"idx":1.0},{"label":"field hockey","verb":"follow","pct":4,"idx":1.8},{"label":"golf","verb":"follow","pct":13,"idx":1.7},{"label":"gymnastics","verb":"follow","pct":15,"idx":1.9},{"label":"handball","verb":"follow","pct":11,"idx":1.2},{"label":"horse-racing / equestrian events","verb":"follow","pct":8,"idx":0.9},{"label":"ice hockey","verb":"follow","pct":60,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":5,"idx":1.6},{"label":"martial arts","verb":"follow","pct":26,"idx":2.4},{"label":"motor sports (e.g. F1)","verb":"follow","pct":36,"idx":1.5},{"label":"netball","verb":"follow","pct":2,"idx":8.0},{"label":"polo","verb":"follow","pct":2,"idx":3.2},{"label":"rowing","verb":"follow","pct":4,"idx":1.0},{"label":"rugby","verb":"follow","pct":7,"idx":1.1},{"label":"sailing","verb":"follow","pct":3,"idx":1.9},{"label":"skateboarding","verb":"follow","pct":7,"idx":2.1},{"label":"soccer","verb":"follow","pct":64,"idx":1.3},{"label":"surfing","verb":"follow","pct":5,"idx":2.9},{"label":"swimming / diving","verb":"follow","pct":16,"idx":1.5},{"label":"table tennis","verb":"follow","pct":11,"idx":1.7},{"label":"tennis","verb":"follow","pct":41,"idx":1.1},{"label":"triathlon","verb":"follow","pct":6,"idx":1.4},{"label":"volleyball","verb":"follow","pct":13,"idx":1.6},{"label":"winter sports","verb":"follow","pct":46,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":13,"idx":3.4},{"label":"squash","verb":"follow","pct":4,"idx":3.6},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":28,"idx":1.0},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":31,"idx":0.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":55,"idx":1.1},{"label":"eating out","verb":"interest","pct":20,"idx":1.2},{"label":"food & drink","verb":"interest","pct":59,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":62,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":56,"idx":1.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":38,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":31,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":12,"idx":1.3},{"label":"DIY / home improvements","verb":"interest","pct":32,"idx":0.9},{"label":"fashion","verb":"interest","pct":32,"idx":1.8},{"label":"fitness & exercise","verb":"interest","pct":33,"idx":1.4},{"label":"pets / pet care","verb":"interest","pct":44,"idx":1.2},{"label":"skincare","verb":"interest","pct":27,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":23,"idx":1.6},{"label":"museums / galleries","verb":"interest","pct":26,"idx":1.1},{"label":"outdoor activities","verb":"interest","pct":38,"idx":1.0},{"label":"travel","verb":"interest","pct":55,"idx":1.1}]}},"Denmark":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":23,"idx":1.5},{"label":"American football","verb":"follow","pct":18,"idx":2.1},{"label":"athletics","verb":"follow","pct":18,"idx":0.9},{"label":"badminton","verb":"follow","pct":16,"idx":0.9},{"label":"baseball","verb":"follow","pct":5,"idx":3.9},{"label":"basketball","verb":"follow","pct":27,"idx":2.9},{"label":"boxing","verb":"follow","pct":23,"idx":2.3},{"label":"cricket","verb":"follow","pct":3,"idx":2.7},{"label":"cycling","verb":"follow","pct":37,"idx":0.9},{"label":"field hockey","verb":"follow","pct":4,"idx":2.9},{"label":"golf","verb":"follow","pct":16,"idx":1.9},{"label":"gymnastics","verb":"follow","pct":14,"idx":1.7},{"label":"handball","verb":"follow","pct":38,"idx":0.8},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":1.6},{"label":"ice hockey","verb":"follow","pct":11,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":4,"idx":1.3},{"label":"martial arts","verb":"follow","pct":21,"idx":2.9},{"label":"motor sports (e.g. F1)","verb":"follow","pct":30,"idx":1.5},{"label":"netball","verb":"follow","pct":2,"idx":3.8},{"label":"polo","verb":"follow","pct":2,"idx":3.6},{"label":"rowing","verb":"follow","pct":4,"idx":1.3},{"label":"rugby","verb":"follow","pct":5,"idx":2.3},{"label":"sailing","verb":"follow","pct":4,"idx":1.0},{"label":"skateboarding","verb":"follow","pct":5,"idx":2.1},{"label":"soccer","verb":"follow","pct":72,"idx":1.2},{"label":"surfing","verb":"follow","pct":6,"idx":2.9},{"label":"swimming / diving","verb":"follow","pct":14,"idx":1.5},{"label":"table tennis","verb":"follow","pct":9,"idx":2.2},{"label":"tennis","verb":"follow","pct":33,"idx":1.1},{"label":"triathlon","verb":"follow","pct":5,"idx":1.9},{"label":"volleyball","verb":"follow","pct":6,"idx":2.9},{"label":"winter sports","verb":"follow","pct":21,"idx":0.8},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":11,"idx":3.9},{"label":"squash","verb":"follow","pct":2,"idx":2.6},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":38,"idx":0.9},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":15,"idx":0.7}],"Food & drink":[{"label":"cooking","verb":"interest","pct":53,"idx":1.1},{"label":"eating out","verb":"interest","pct":46,"idx":1.1},{"label":"food & drink","verb":"interest","pct":41,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":61,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":50,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":32,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":32,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":19,"idx":1.0},{"label":"DIY / home improvements","verb":"interest","pct":34,"idx":1.0},{"label":"fashion","verb":"interest","pct":30,"idx":1.9},{"label":"fitness & exercise","verb":"interest","pct":36,"idx":1.0},{"label":"pets / pet care","verb":"interest","pct":36,"idx":1.3},{"label":"skincare","verb":"interest","pct":35,"idx":1.6}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":14,"idx":1.3},{"label":"museums / galleries","verb":"interest","pct":25,"idx":0.8},{"label":"outdoor activities","verb":"interest","pct":31,"idx":0.9},{"label":"travel","verb":"interest","pct":52,"idx":1.0}]}},"Egypt":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":26,"idx":2.0},{"label":"American football","verb":"follow","pct":34,"idx":1.6},{"label":"athletics","verb":"follow","pct":21,"idx":1.8},{"label":"badminton","verb":"follow","pct":1,"idx":1.4},{"label":"baseball","verb":"follow","pct":5,"idx":1.7},{"label":"basketball","verb":"follow","pct":28,"idx":1.7},{"label":"boxing","verb":"follow","pct":22,"idx":2.1},{"label":"cricket","verb":"follow","pct":1,"idx":1.0},{"label":"cycling","verb":"follow","pct":17,"idx":1.9},{"label":"field hockey","verb":"follow","pct":1,"idx":1.4},{"label":"golf","verb":"follow","pct":11,"idx":1.6},{"label":"gymnastics","verb":"follow","pct":8,"idx":1.6},{"label":"handball","verb":"follow","pct":23,"idx":1.9},{"label":"horse-racing / equestrian events","verb":"follow","pct":8,"idx":2.3},{"label":"ice hockey","verb":"follow","pct":4,"idx":1.5},{"label":"long-distance running","verb":"follow","pct":7,"idx":1.6},{"label":"martial arts","verb":"follow","pct":15,"idx":1.9},{"label":"motor sports (e.g. F1)","verb":"follow","pct":20,"idx":1.9},{"label":"netball","verb":"follow","pct":2,"idx":1.4},{"label":"polo","verb":"follow","pct":1,"idx":2.2},{"label":"rowing","verb":"follow","pct":3,"idx":1.9},{"label":"rugby","verb":"follow","pct":2,"idx":1.2},{"label":"sailing","verb":"follow","pct":2,"idx":1.6},{"label":"skateboarding","verb":"follow","pct":5,"idx":1.6},{"label":"soccer","verb":"follow","pct":89,"idx":1.3},{"label":"surfing","verb":"follow","pct":6,"idx":1.9},{"label":"swimming / diving","verb":"follow","pct":22,"idx":1.8},{"label":"table tennis","verb":"follow","pct":13,"idx":1.7},{"label":"tennis","verb":"follow","pct":26,"idx":1.6},{"label":"triathlon","verb":"follow","pct":1,"idx":1.1},{"label":"volleyball","verb":"follow","pct":9,"idx":2.3},{"label":"winter sports","verb":"follow","pct":10,"idx":1.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":37,"idx":2.0},{"label":"squash","verb":"follow","pct":6,"idx":2.4},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":52,"idx":1.6},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":6,"idx":1.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":46,"idx":1.4},{"label":"eating out","verb":"interest","pct":28,"idx":1.6},{"label":"food & drink","verb":"interest","pct":44,"idx":1.5}],"Music & entertainment":[{"label":"music","verb":"interest","pct":39,"idx":1.6},{"label":"films / cinema","verb":"interest","pct":45,"idx":1.5}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":28,"idx":1.3},{"label":"cars / motoring","verb":"interest","pct":25,"idx":1.6},{"label":"charities / volunteering","verb":"interest","pct":26,"idx":1.4},{"label":"DIY / home improvements","verb":"interest","pct":28,"idx":1.3},{"label":"fashion","verb":"interest","pct":26,"idx":1.5},{"label":"fitness & exercise","verb":"interest","pct":29,"idx":1.6},{"label":"pets / pet care","verb":"interest","pct":25,"idx":1.7},{"label":"skincare","verb":"interest","pct":30,"idx":1.4}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":28,"idx":1.5},{"label":"museums / galleries","verb":"interest","pct":24,"idx":1.6},{"label":"outdoor activities","verb":"interest","pct":15,"idx":1.4},{"label":"travel","verb":"interest","pct":30,"idx":1.4}]}},"France":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":19,"idx":1.7},{"label":"American football","verb":"follow","pct":12,"idx":2.2},{"label":"athletics","verb":"follow","pct":22,"idx":0.9},{"label":"badminton","verb":"follow","pct":7,"idx":1.7},{"label":"baseball","verb":"follow","pct":7,"idx":2.8},{"label":"basketball","verb":"follow","pct":35,"idx":1.8},{"label":"boxing","verb":"follow","pct":25,"idx":2.7},{"label":"cricket","verb":"follow","pct":1,"idx":2.0},{"label":"cycling","verb":"follow","pct":30,"idx":0.9},{"label":"field hockey","verb":"follow","pct":1,"idx":2.2},{"label":"golf","verb":"follow","pct":12,"idx":1.8},{"label":"gymnastics","verb":"follow","pct":14,"idx":1.3},{"label":"handball","verb":"follow","pct":16,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":7,"idx":1.4},{"label":"ice hockey","verb":"follow","pct":6,"idx":1.5},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.1},{"label":"martial arts","verb":"follow","pct":18,"idx":2.1},{"label":"motor sports (e.g. F1)","verb":"follow","pct":33,"idx":1.5},{"label":"netball","verb":"follow","pct":1,"idx":2.0},{"label":"polo","verb":"follow","pct":1,"idx":2.2},{"label":"rowing","verb":"follow","pct":3,"idx":1.2},{"label":"rugby","verb":"follow","pct":33,"idx":0.9},{"label":"sailing","verb":"follow","pct":5,"idx":1.0},{"label":"skateboarding","verb":"follow","pct":5,"idx":1.9},{"label":"soccer","verb":"follow","pct":72,"idx":1.4},{"label":"surfing","verb":"follow","pct":6,"idx":2.0},{"label":"swimming / diving","verb":"follow","pct":21,"idx":1.1},{"label":"table tennis","verb":"follow","pct":10,"idx":1.2},{"label":"tennis","verb":"follow","pct":42,"idx":1.1},{"label":"triathlon","verb":"follow","pct":6,"idx":0.8},{"label":"volleyball","verb":"follow","pct":9,"idx":1.3},{"label":"winter sports","verb":"follow","pct":32,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":12,"idx":3.2},{"label":"squash","verb":"follow","pct":1,"idx":1.1},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":43,"idx":1.4},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":28,"idx":0.9}],"Food & drink":[{"label":"cooking","verb":"interest","pct":55,"idx":1.1},{"label":"eating out","verb":"interest","pct":50,"idx":1.0},{"label":"food & drink","verb":"interest","pct":41,"idx":1.3}],"Music & entertainment":[{"label":"music","verb":"interest","pct":60,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":63,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":35,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":25,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":13,"idx":1.2},{"label":"DIY / home improvements","verb":"interest","pct":31,"idx":0.9},{"label":"fashion","verb":"interest","pct":32,"idx":1.9},{"label":"fitness & exercise","verb":"interest","pct":29,"idx":1.4},{"label":"pets / pet care","verb":"interest","pct":40,"idx":1.3},{"label":"skincare","verb":"interest","pct":38,"idx":1.6}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":16,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":24,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":36,"idx":1.0},{"label":"travel","verb":"interest","pct":50,"idx":1.1}]}},"Germany":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":20,"idx":1.8},{"label":"American football","verb":"follow","pct":20,"idx":1.8},{"label":"athletics","verb":"follow","pct":22,"idx":0.9},{"label":"badminton","verb":"follow","pct":6,"idx":1.8},{"label":"baseball","verb":"follow","pct":7,"idx":2.5},{"label":"basketball","verb":"follow","pct":31,"idx":1.7},{"label":"boxing","verb":"follow","pct":24,"idx":2.0},{"label":"cricket","verb":"follow","pct":2,"idx":2.0},{"label":"cycling","verb":"follow","pct":20,"idx":1.1},{"label":"field hockey","verb":"follow","pct":2,"idx":1.2},{"label":"golf","verb":"follow","pct":13,"idx":2.0},{"label":"gymnastics","verb":"follow","pct":12,"idx":1.7},{"label":"handball","verb":"follow","pct":21,"idx":0.9},{"label":"horse-racing / equestrian events","verb":"follow","pct":7,"idx":1.5},{"label":"ice hockey","verb":"follow","pct":15,"idx":1.2},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.1},{"label":"martial arts","verb":"follow","pct":18,"idx":2.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":36,"idx":1.5},{"label":"netball","verb":"follow","pct":1,"idx":2.3},{"label":"polo","verb":"follow","pct":2,"idx":1.7},{"label":"rowing","verb":"follow","pct":4,"idx":1.0},{"label":"rugby","verb":"follow","pct":5,"idx":1.5},{"label":"sailing","verb":"follow","pct":4,"idx":1.3},{"label":"skateboarding","verb":"follow","pct":4,"idx":2.0},{"label":"soccer","verb":"follow","pct":76,"idx":1.2},{"label":"surfing","verb":"follow","pct":7,"idx":2.2},{"label":"swimming / diving","verb":"follow","pct":21,"idx":1.3},{"label":"table tennis","verb":"follow","pct":9,"idx":1.5},{"label":"tennis","verb":"follow","pct":29,"idx":1.4},{"label":"triathlon","verb":"follow","pct":6,"idx":0.9},{"label":"volleyball","verb":"follow","pct":11,"idx":1.8},{"label":"winter sports","verb":"follow","pct":33,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":15,"idx":2.5},{"label":"squash","verb":"follow","pct":2,"idx":1.8},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":50,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":25,"idx":0.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.1},{"label":"eating out","verb":"interest","pct":40,"idx":1.1},{"label":"food & drink","verb":"interest","pct":62,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":65,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":54,"idx":1.3}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":36,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":39,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":14,"idx":1.0},{"label":"DIY / home improvements","verb":"interest","pct":29,"idx":1.1},{"label":"fashion","verb":"interest","pct":36,"idx":1.5},{"label":"fitness & exercise","verb":"interest","pct":42,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":40,"idx":1.3},{"label":"skincare","verb":"interest","pct":41,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":24,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":26,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":38,"idx":1.0},{"label":"travel","verb":"interest","pct":51,"idx":1.0}]}},"Ghana":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":28,"idx":3.0},{"label":"American football","verb":"follow","pct":1,"idx":0.3},{"label":"athletics","verb":"follow","pct":20,"idx":3.2},{"label":"baseball","verb":"follow","pct":1,"idx":0.7},{"label":"basketball","verb":"follow","pct":8,"idx":1.0},{"label":"boxing","verb":"follow","pct":16,"idx":1.5},{"label":"cricket","verb":"follow","pct":0,"idx":0.5},{"label":"cycling","verb":"follow","pct":10,"idx":3.7},{"label":"field hockey","verb":"follow","pct":0,"idx":0.2},{"label":"golf","verb":"follow","pct":2,"idx":0.5},{"label":"gymnastics","verb":"follow","pct":15,"idx":8.7},{"label":"horse-racing / equestrian events","verb":"follow","pct":2,"idx":6.2},{"label":"ice hockey","verb":"follow","pct":0,"idx":0.7},{"label":"long-distance running","verb":"follow","pct":16,"idx":8.5},{"label":"martial arts","verb":"follow","pct":4,"idx":1.6},{"label":"motor sports (e.g. F1)","verb":"follow","pct":4,"idx":1.1},{"label":"netball","verb":"follow","pct":2,"idx":2.3},{"label":"polo","verb":"follow","pct":0,"idx":0.2},{"label":"rowing","verb":"follow","pct":3,"idx":7.8},{"label":"rugby","verb":"follow","pct":0,"idx":0.8},{"label":"sailing","verb":"follow","pct":1,"idx":1.9},{"label":"skateboarding","verb":"follow","pct":2,"idx":3.1},{"label":"soccer","verb":"follow","pct":57,"idx":1.3},{"label":"surfing","verb":"follow","pct":2,"idx":4.7},{"label":"swimming / diving","verb":"follow","pct":24,"idx":4.6},{"label":"table tennis","verb":"follow","pct":4,"idx":0.7},{"label":"tennis","verb":"follow","pct":4,"idx":0.9},{"label":"triathlon","verb":"follow","pct":2,"idx":5.7},{"label":"volleyball","verb":"follow","pct":4,"idx":0.9},{"label":"winter sports","verb":"follow","pct":3,"idx":16.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":30,"idx":1.9},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":44,"idx":1.6},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":1,"idx":2.5}],"Food & drink":[{"label":"cooking","verb":"interest","pct":53,"idx":1.9},{"label":"eating out","verb":"interest","pct":28,"idx":2.9},{"label":"food & drink","verb":"interest","pct":64,"idx":1.3}],"Music & entertainment":[{"label":"music","verb":"interest","pct":76,"idx":1.0},{"label":"films / cinema","verb":"interest","pct":44,"idx":2.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":44,"idx":2.1},{"label":"cars / motoring","verb":"interest","pct":43,"idx":4.1},{"label":"charities / volunteering","verb":"interest","pct":28,"idx":1.7},{"label":"DIY / home improvements","verb":"interest","pct":54,"idx":3.0},{"label":"fashion","verb":"interest","pct":50,"idx":0.9},{"label":"fitness & exercise","verb":"interest","pct":38,"idx":1.4},{"label":"pets / pet care","verb":"interest","pct":23,"idx":1.8},{"label":"skincare","verb":"interest","pct":34,"idx":1.9}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":30,"idx":0.8},{"label":"museums / galleries","verb":"interest","pct":33,"idx":2.4},{"label":"outdoor activities","verb":"interest","pct":32,"idx":1.3},{"label":"travel","verb":"interest","pct":28,"idx":4.3}]}},"Greece":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":25,"idx":1.4},{"label":"American football","verb":"follow","pct":7,"idx":1.4},{"label":"athletics","verb":"follow","pct":33,"idx":1.0},{"label":"badminton","verb":"follow","pct":2,"idx":1.8},{"label":"baseball","verb":"follow","pct":3,"idx":1.1},{"label":"basketball","verb":"follow","pct":70,"idx":1.1},{"label":"boxing","verb":"follow","pct":15,"idx":1.5},{"label":"cricket","verb":"follow","pct":1,"idx":1.1},{"label":"cycling","verb":"follow","pct":14,"idx":1.2},{"label":"field hockey","verb":"follow","pct":1,"idx":0.9},{"label":"golf","verb":"follow","pct":6,"idx":1.3},{"label":"gymnastics","verb":"follow","pct":20,"idx":1.2},{"label":"handball","verb":"follow","pct":5,"idx":1.2},{"label":"horse-racing / equestrian events","verb":"follow","pct":4,"idx":1.2},{"label":"ice hockey","verb":"follow","pct":4,"idx":1.2},{"label":"long-distance running","verb":"follow","pct":10,"idx":1.3},{"label":"martial arts","verb":"follow","pct":19,"idx":1.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":39,"idx":1.1},{"label":"polo","verb":"follow","pct":2,"idx":1.6},{"label":"rowing","verb":"follow","pct":6,"idx":1.2},{"label":"rugby","verb":"follow","pct":2,"idx":1.1},{"label":"sailing","verb":"follow","pct":6,"idx":1.2},{"label":"skateboarding","verb":"follow","pct":3,"idx":1.0},{"label":"soccer","verb":"follow","pct":79,"idx":1.1},{"label":"surfing","verb":"follow","pct":4,"idx":1.2},{"label":"swimming / diving","verb":"follow","pct":28,"idx":1.2},{"label":"table tennis","verb":"follow","pct":7,"idx":1.5},{"label":"tennis","verb":"follow","pct":31,"idx":1.1},{"label":"triathlon","verb":"follow","pct":5,"idx":1.2},{"label":"volleyball","verb":"follow","pct":23,"idx":1.5},{"label":"winter sports","verb":"follow","pct":29,"idx":1.3},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":14,"idx":1.4},{"label":"squash","verb":"follow","pct":0,"idx":0.6},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":41,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":25,"idx":1.3}],"Food & drink":[{"label":"cooking","verb":"interest","pct":59,"idx":1.2},{"label":"eating out","verb":"interest","pct":57,"idx":1.1},{"label":"food & drink","verb":"interest","pct":56,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":65,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":61,"idx":1.0}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":42,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":35,"idx":1.2},{"label":"charities / volunteering","verb":"interest","pct":20,"idx":1.2},{"label":"DIY / home improvements","verb":"interest","pct":37,"idx":1.1},{"label":"fashion","verb":"interest","pct":33,"idx":1.5},{"label":"fitness & exercise","verb":"interest","pct":46,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":41,"idx":1.2},{"label":"skincare","verb":"interest","pct":40,"idx":1.4}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":23,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":28,"idx":1.1},{"label":"outdoor activities","verb":"interest","pct":34,"idx":1.0},{"label":"travel","verb":"interest","pct":58,"idx":1.1}]}},"Hungary":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":13,"idx":1.3},{"label":"American football","verb":"follow","pct":13,"idx":1.5},{"label":"athletics","verb":"follow","pct":20,"idx":1.0},{"label":"badminton","verb":"follow","pct":6,"idx":1.5},{"label":"baseball","verb":"follow","pct":5,"idx":1.6},{"label":"basketball","verb":"follow","pct":30,"idx":1.7},{"label":"boxing","verb":"follow","pct":22,"idx":2.1},{"label":"cricket","verb":"follow","pct":1,"idx":0.9},{"label":"cycling","verb":"follow","pct":23,"idx":1.1},{"label":"field hockey","verb":"follow","pct":1,"idx":1.9},{"label":"golf","verb":"follow","pct":8,"idx":1.8},{"label":"gymnastics","verb":"follow","pct":6,"idx":1.0},{"label":"handball","verb":"follow","pct":26,"idx":1.1},{"label":"horse-racing / equestrian events","verb":"follow","pct":7,"idx":1.7},{"label":"ice hockey","verb":"follow","pct":9,"idx":1.3},{"label":"long-distance running","verb":"follow","pct":4,"idx":1.2},{"label":"martial arts","verb":"follow","pct":18,"idx":1.9},{"label":"motor sports (e.g. F1)","verb":"follow","pct":39,"idx":1.2},{"label":"netball","verb":"follow","pct":1,"idx":1.4},{"label":"polo","verb":"follow","pct":2,"idx":1.9},{"label":"rowing","verb":"follow","pct":7,"idx":0.9},{"label":"rugby","verb":"follow","pct":3,"idx":1.8},{"label":"sailing","verb":"follow","pct":4,"idx":1.6},{"label":"skateboarding","verb":"follow","pct":3,"idx":1.6},{"label":"soccer","verb":"follow","pct":63,"idx":1.3},{"label":"surfing","verb":"follow","pct":3,"idx":1.7},{"label":"swimming / diving","verb":"follow","pct":25,"idx":0.9},{"label":"table tennis","verb":"follow","pct":10,"idx":1.1},{"label":"tennis","verb":"follow","pct":22,"idx":1.2},{"label":"triathlon","verb":"follow","pct":4,"idx":1.0},{"label":"volleyball","verb":"follow","pct":9,"idx":1.4},{"label":"winter sports","verb":"follow","pct":24,"idx":1.1},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":10,"idx":2.2},{"label":"squash","verb":"follow","pct":2,"idx":1.3},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":29,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":19,"idx":1.0}],"Food & drink":[{"label":"cooking","verb":"interest","pct":61,"idx":1.1},{"label":"eating out","verb":"interest","pct":29,"idx":1.3},{"label":"food & drink","verb":"interest","pct":52,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":63,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":60,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":40,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":31,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":18,"idx":1.3},{"label":"DIY / home improvements","verb":"interest","pct":33,"idx":1.0},{"label":"fashion","verb":"interest","pct":27,"idx":1.8},{"label":"fitness & exercise","verb":"interest","pct":25,"idx":1.4},{"label":"pets / pet care","verb":"interest","pct":42,"idx":1.4},{"label":"skincare","verb":"interest","pct":33,"idx":1.4}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":20,"idx":1.0},{"label":"museums / galleries","verb":"interest","pct":27,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":40,"idx":1.2},{"label":"travel","verb":"interest","pct":44,"idx":1.1}]}},"Ireland":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":29,"idx":1.2},{"label":"American football","verb":"follow","pct":17,"idx":1.3},{"label":"athletics","verb":"follow","pct":27,"idx":0.9},{"label":"badminton","verb":"follow","pct":7,"idx":1.3},{"label":"baseball","verb":"follow","pct":6,"idx":1.4},{"label":"basketball","verb":"follow","pct":27,"idx":1.6},{"label":"boxing","verb":"follow","pct":34,"idx":1.6},{"label":"cricket","verb":"follow","pct":8,"idx":0.9},{"label":"cycling","verb":"follow","pct":18,"idx":1.0},{"label":"field hockey","verb":"follow","pct":2,"idx":1.4},{"label":"Gaelic football","verb":"follow","pct":40,"idx":1.2},{"label":"Gaelic hurling","verb":"follow","pct":27,"idx":1.0},{"label":"golf","verb":"follow","pct":30,"idx":1.0},{"label":"gymnastics","verb":"follow","pct":15,"idx":1.1},{"label":"horse-racing / equestrian events","verb":"follow","pct":14,"idx":1.0},{"label":"ice hockey","verb":"follow","pct":6,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":9,"idx":1.3},{"label":"martial arts","verb":"follow","pct":23,"idx":1.6},{"label":"motor sports (e.g. F1)","verb":"follow","pct":33,"idx":1.2},{"label":"netball","verb":"follow","pct":2,"idx":1.6},{"label":"polo","verb":"follow","pct":1,"idx":1.0},{"label":"rowing","verb":"follow","pct":5,"idx":0.9},{"label":"rugby","verb":"follow","pct":51,"idx":1.0},{"label":"sailing","verb":"follow","pct":3,"idx":1.2},{"label":"skateboarding","verb":"follow","pct":4,"idx":1.2},{"label":"soccer","verb":"follow","pct":73,"idx":1.1},{"label":"surfing","verb":"follow","pct":5,"idx":1.4},{"label":"swimming / diving","verb":"follow","pct":18,"idx":1.2},{"label":"table tennis","verb":"follow","pct":9,"idx":1.4},{"label":"tennis","verb":"follow","pct":36,"idx":1.0},{"label":"triathlon","verb":"follow","pct":4,"idx":1.3},{"label":"volleyball","verb":"follow","pct":6,"idx":1.5},{"label":"winter sports","verb":"follow","pct":24,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":15,"idx":1.7},{"label":"squash","verb":"follow","pct":2,"idx":1.5},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":42,"idx":1.0},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":20,"idx":0.9}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.1},{"label":"eating out","verb":"interest","pct":56,"idx":1.1},{"label":"food & drink","verb":"interest","pct":63,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":68,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":60,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":40,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":32,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":20,"idx":1.0},{"label":"DIY / home improvements","verb":"interest","pct":44,"idx":1.0},{"label":"fashion","verb":"interest","pct":36,"idx":1.5},{"label":"fitness & exercise","verb":"interest","pct":47,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":41,"idx":1.1},{"label":"skincare","verb":"interest","pct":45,"idx":1.4}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":16,"idx":1.0},{"label":"museums / galleries","verb":"interest","pct":29,"idx":0.8},{"label":"outdoor activities","verb":"interest","pct":36,"idx":1.1},{"label":"travel","verb":"interest","pct":58,"idx":1.0}]}},"Israel":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":18,"idx":1.7},{"label":"American football","verb":"follow","pct":9,"idx":1.7},{"label":"athletics","verb":"follow","pct":23,"idx":1.1},{"label":"badminton","verb":"follow","pct":3,"idx":2.4},{"label":"baseball","verb":"follow","pct":5,"idx":1.4},{"label":"basketball","verb":"follow","pct":43,"idx":1.3},{"label":"boxing","verb":"follow","pct":12,"idx":2.3},{"label":"cricket","verb":"follow","pct":1,"idx":1.8},{"label":"cycling","verb":"follow","pct":14,"idx":1.5},{"label":"field hockey","verb":"follow","pct":1,"idx":2.8},{"label":"golf","verb":"follow","pct":7,"idx":2.3},{"label":"gymnastics","verb":"follow","pct":17,"idx":1.1},{"label":"handball","verb":"follow","pct":4,"idx":1.3},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":2.1},{"label":"ice hockey","verb":"follow","pct":5,"idx":1.5},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.5},{"label":"martial arts","verb":"follow","pct":14,"idx":1.8},{"label":"motor sports (e.g. F1)","verb":"follow","pct":18,"idx":1.8},{"label":"netball","verb":"follow","pct":2,"idx":2.5},{"label":"polo","verb":"follow","pct":1,"idx":1.6},{"label":"rowing","verb":"follow","pct":3,"idx":1.7},{"label":"rugby","verb":"follow","pct":3,"idx":2.2},{"label":"sailing","verb":"follow","pct":5,"idx":1.6},{"label":"skateboarding","verb":"follow","pct":3,"idx":2.3},{"label":"soccer","verb":"follow","pct":60,"idx":1.3},{"label":"surfing","verb":"follow","pct":8,"idx":1.7},{"label":"swimming / diving","verb":"follow","pct":20,"idx":1.4},{"label":"table tennis","verb":"follow","pct":10,"idx":2.2},{"label":"tennis","verb":"follow","pct":25,"idx":1.4},{"label":"triathlon","verb":"follow","pct":4,"idx":1.5},{"label":"volleyball","verb":"follow","pct":5,"idx":1.5},{"label":"winter sports","verb":"follow","pct":15,"idx":1.3},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":14,"idx":2.3},{"label":"squash","verb":"follow","pct":1,"idx":1.4},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":31,"idx":1.3},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":11,"idx":1.3}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.2},{"label":"eating out","verb":"interest","pct":53,"idx":1.1},{"label":"food & drink","verb":"interest","pct":44,"idx":1.3}],"Music & entertainment":[{"label":"music","verb":"interest","pct":64,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":58,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":36,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":32,"idx":1.5},{"label":"charities / volunteering","verb":"interest","pct":18,"idx":1.2},{"label":"DIY / home improvements","verb":"interest","pct":39,"idx":1.2},{"label":"fashion","verb":"interest","pct":37,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":43,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":36,"idx":1.4},{"label":"skincare","verb":"interest","pct":38,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":28,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":26,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":31,"idx":1.1},{"label":"travel","verb":"interest","pct":51,"idx":1.1}]}},"Italy":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":24,"idx":1.6},{"label":"American football","verb":"follow","pct":9,"idx":1.7},{"label":"athletics","verb":"follow","pct":29,"idx":0.9},{"label":"badminton","verb":"follow","pct":2,"idx":2.1},{"label":"baseball","verb":"follow","pct":6,"idx":1.6},{"label":"basketball","verb":"follow","pct":32,"idx":1.4},{"label":"boxing","verb":"follow","pct":14,"idx":2.0},{"label":"cricket","verb":"follow","pct":1,"idx":2.5},{"label":"cycling","verb":"follow","pct":34,"idx":1.1},{"label":"field hockey","verb":"follow","pct":1,"idx":1.6},{"label":"golf","verb":"follow","pct":9,"idx":1.6},{"label":"gymnastics","verb":"follow","pct":22,"idx":1.3},{"label":"handball","verb":"follow","pct":5,"idx":1.8},{"label":"horse-racing / equestrian events","verb":"follow","pct":4,"idx":1.4},{"label":"ice hockey","verb":"follow","pct":5,"idx":1.7},{"label":"long-distance running","verb":"follow","pct":5,"idx":1.2},{"label":"martial arts","verb":"follow","pct":13,"idx":1.9},{"label":"motor sports (e.g. F1)","verb":"follow","pct":47,"idx":1.2},{"label":"netball","verb":"follow","pct":1,"idx":1.5},{"label":"polo","verb":"follow","pct":1,"idx":1.5},{"label":"rowing","verb":"follow","pct":4,"idx":1.1},{"label":"rugby","verb":"follow","pct":14,"idx":1.1},{"label":"sailing","verb":"follow","pct":7,"idx":1.1},{"label":"skateboarding","verb":"follow","pct":3,"idx":1.8},{"label":"soccer","verb":"follow","pct":78,"idx":1.1},{"label":"surfing","verb":"follow","pct":4,"idx":1.9},{"label":"swimming / diving","verb":"follow","pct":28,"idx":1.1},{"label":"table tennis","verb":"follow","pct":4,"idx":1.4},{"label":"tennis","verb":"follow","pct":49,"idx":1.1},{"label":"triathlon","verb":"follow","pct":4,"idx":1.3},{"label":"volleyball","verb":"follow","pct":28,"idx":1.2},{"label":"winter sports","verb":"follow","pct":38,"idx":1.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":12,"idx":2.1},{"label":"squash","verb":"follow","pct":1,"idx":1.7},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":43,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":32,"idx":1.0}],"Food & drink":[{"label":"cooking","verb":"interest","pct":57,"idx":1.1},{"label":"eating out","verb":"interest","pct":52,"idx":1.2},{"label":"food & drink","verb":"interest","pct":44,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":65,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":65,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":44,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":29,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":20,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":37,"idx":1.0},{"label":"fashion","verb":"interest","pct":32,"idx":1.6},{"label":"fitness & exercise","verb":"interest","pct":36,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":42,"idx":1.2},{"label":"skincare","verb":"interest","pct":39,"idx":1.4}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":22,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":35,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":31,"idx":1.1},{"label":"travel","verb":"interest","pct":59,"idx":1.1}]}},"Kenya":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":31,"idx":1.9},{"label":"American football","verb":"follow","pct":16,"idx":2.3},{"label":"athletics","verb":"follow","pct":48,"idx":1.9},{"label":"badminton","verb":"follow","pct":5,"idx":1.2},{"label":"baseball","verb":"follow","pct":7,"idx":1.3},{"label":"basketball","verb":"follow","pct":36,"idx":1.6},{"label":"boxing","verb":"follow","pct":22,"idx":1.8},{"label":"cricket","verb":"follow","pct":2,"idx":0.6},{"label":"cycling","verb":"follow","pct":15,"idx":1.3},{"label":"field hockey","verb":"follow","pct":2,"idx":0.7},{"label":"golf","verb":"follow","pct":10,"idx":1.2},{"label":"gymnastics","verb":"follow","pct":14,"idx":1.6},{"label":"horse-racing / equestrian events","verb":"follow","pct":4,"idx":2.6},{"label":"ice hockey","verb":"follow","pct":3,"idx":0.8},{"label":"long-distance running","verb":"follow","pct":20,"idx":2.0},{"label":"martial arts","verb":"follow","pct":19,"idx":1.9},{"label":"motor sports (e.g. F1)","verb":"follow","pct":33,"idx":1.6},{"label":"netball","verb":"follow","pct":9,"idx":2.0},{"label":"polo","verb":"follow","pct":0,"idx":0.8},{"label":"rowing","verb":"follow","pct":1,"idx":0.6},{"label":"rugby","verb":"follow","pct":18,"idx":1.2},{"label":"sailing","verb":"follow","pct":2,"idx":0.6},{"label":"skateboarding","verb":"follow","pct":4,"idx":1.4},{"label":"soccer","verb":"follow","pct":82,"idx":1.1},{"label":"surfing","verb":"follow","pct":4,"idx":1.1},{"label":"swimming / diving","verb":"follow","pct":28,"idx":3.1},{"label":"table tennis","verb":"follow","pct":9,"idx":1.3},{"label":"tennis","verb":"follow","pct":14,"idx":1.4},{"label":"triathlon","verb":"follow","pct":1,"idx":0.7},{"label":"volleyball","verb":"follow","pct":20,"idx":2.9},{"label":"winter sports","verb":"follow","pct":8,"idx":1.8},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":37,"idx":2.0},{"label":"squash","verb":"follow","pct":0,"idx":0.8},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":42,"idx":2.0},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":5,"idx":1.5}],"Food & drink":[{"label":"cooking","verb":"interest","pct":44,"idx":1.9},{"label":"eating out","verb":"interest","pct":36,"idx":1.9},{"label":"food & drink","verb":"interest","pct":55,"idx":2.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":59,"idx":1.7},{"label":"films / cinema","verb":"interest","pct":27,"idx":1.3}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":32,"idx":1.5},{"label":"cars / motoring","verb":"interest","pct":26,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":27,"idx":1.4},{"label":"DIY / home improvements","verb":"interest","pct":28,"idx":1.6},{"label":"fashion","verb":"interest","pct":38,"idx":1.5},{"label":"fitness & exercise","verb":"interest","pct":42,"idx":1.4},{"label":"pets / pet care","verb":"interest","pct":20,"idx":1.4},{"label":"skincare","verb":"interest","pct":31,"idx":1.9}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":20,"idx":1.3},{"label":"museums / galleries","verb":"interest","pct":20,"idx":1.2},{"label":"outdoor activities","verb":"interest","pct":32,"idx":1.7},{"label":"travel","verb":"interest","pct":44,"idx":1.9}]}},"Morocco":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":40,"idx":1.4},{"label":"American football","verb":"follow","pct":4,"idx":1.8},{"label":"athletics","verb":"follow","pct":32,"idx":2.7},{"label":"badminton","verb":"follow","pct":0,"idx":0.3},{"label":"baseball","verb":"follow","pct":1,"idx":1.8},{"label":"basketball","verb":"follow","pct":14,"idx":1.2},{"label":"boxing","verb":"follow","pct":15,"idx":1.4},{"label":"cricket","verb":"follow","pct":0,"idx":2.0},{"label":"cycling","verb":"follow","pct":32,"idx":4.1},{"label":"golf","verb":"follow","pct":4,"idx":1.5},{"label":"gymnastics","verb":"follow","pct":4,"idx":1.5},{"label":"horse-racing / equestrian events","verb":"follow","pct":11,"idx":2.5},{"label":"ice hockey","verb":"follow","pct":1,"idx":3.3},{"label":"long-distance running","verb":"follow","pct":5,"idx":1.7},{"label":"martial arts","verb":"follow","pct":7,"idx":1.4},{"label":"motor sports (e.g. F1)","verb":"follow","pct":10,"idx":1.4},{"label":"netball","verb":"follow","pct":1,"idx":1.1},{"label":"polo","verb":"follow","pct":1,"idx":1.6},{"label":"rowing","verb":"follow","pct":1,"idx":1.3},{"label":"rugby","verb":"follow","pct":1,"idx":1.8},{"label":"sailing","verb":"follow","pct":1,"idx":3.3},{"label":"skateboarding","verb":"follow","pct":4,"idx":1.4},{"label":"soccer","verb":"follow","pct":90,"idx":1.0},{"label":"surfing","verb":"follow","pct":5,"idx":1.5},{"label":"swimming / diving","verb":"follow","pct":11,"idx":2.0},{"label":"table tennis","verb":"follow","pct":4,"idx":2.0},{"label":"tennis","verb":"follow","pct":14,"idx":1.4},{"label":"triathlon","verb":"follow","pct":1,"idx":1.4},{"label":"volleyball","verb":"follow","pct":3,"idx":1.3},{"label":"winter sports","verb":"follow","pct":4,"idx":1.7},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":14,"idx":1.8},{"label":"squash","verb":"follow","pct":0,"idx":1.7},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":73,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":3,"idx":1.3}],"Food & drink":[{"label":"cooking","verb":"interest","pct":37,"idx":1.0},{"label":"eating out","verb":"interest","pct":18,"idx":1.1},{"label":"food & drink","verb":"interest","pct":39,"idx":1.6}],"Music & entertainment":[{"label":"music","verb":"interest","pct":57,"idx":1.3},{"label":"films / cinema","verb":"interest","pct":48,"idx":2.3}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":19,"idx":1.8},{"label":"cars / motoring","verb":"interest","pct":12,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":23,"idx":1.7},{"label":"DIY / home improvements","verb":"interest","pct":37,"idx":1.6},{"label":"fashion","verb":"interest","pct":25,"idx":1.3},{"label":"fitness & exercise","verb":"interest","pct":24,"idx":0.9},{"label":"pets / pet care","verb":"interest","pct":29,"idx":2.5},{"label":"skincare","verb":"interest","pct":39,"idx":1.0}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":19,"idx":1.6},{"label":"museums / galleries","verb":"interest","pct":9,"idx":1.6},{"label":"outdoor activities","verb":"interest","pct":38,"idx":1.4},{"label":"travel","verb":"interest","pct":20,"idx":0.7}]}},"Netherlands":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":22,"idx":1.4},{"label":"American football","verb":"follow","pct":14,"idx":2.0},{"label":"athletics","verb":"follow","pct":19,"idx":0.9},{"label":"badminton","verb":"follow","pct":8,"idx":1.8},{"label":"baseball","verb":"follow","pct":7,"idx":1.4},{"label":"basketball","verb":"follow","pct":26,"idx":1.7},{"label":"boxing","verb":"follow","pct":25,"idx":1.9},{"label":"cricket","verb":"follow","pct":2,"idx":1.5},{"label":"cycling","verb":"follow","pct":26,"idx":0.9},{"label":"field hockey","verb":"follow","pct":9,"idx":1.3},{"label":"golf","verb":"follow","pct":14,"idx":1.8},{"label":"gymnastics","verb":"follow","pct":12,"idx":1.7},{"label":"handball","verb":"follow","pct":9,"idx":1.2},{"label":"horse-racing / equestrian events","verb":"follow","pct":7,"idx":1.7},{"label":"ice hockey","verb":"follow","pct":9,"idx":1.8},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.1},{"label":"martial arts","verb":"follow","pct":26,"idx":1.7},{"label":"motor sports (e.g. F1)","verb":"follow","pct":43,"idx":1.2},{"label":"netball","verb":"follow","pct":2,"idx":3.0},{"label":"polo","verb":"follow","pct":2,"idx":2.3},{"label":"rowing","verb":"follow","pct":4,"idx":1.1},{"label":"rugby","verb":"follow","pct":7,"idx":1.3},{"label":"sailing","verb":"follow","pct":5,"idx":1.3},{"label":"skateboarding","verb":"follow","pct":6,"idx":1.7},{"label":"soccer","verb":"follow","pct":76,"idx":1.2},{"label":"surfing","verb":"follow","pct":7,"idx":2.0},{"label":"swimming / diving","verb":"follow","pct":18,"idx":1.3},{"label":"table tennis","verb":"follow","pct":9,"idx":2.0},{"label":"tennis","verb":"follow","pct":31,"idx":1.2},{"label":"triathlon","verb":"follow","pct":4,"idx":1.1},{"label":"volleyball","verb":"follow","pct":10,"idx":1.3},{"label":"winter sports","verb":"follow","pct":33,"idx":1.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":12,"idx":2.4},{"label":"squash","verb":"follow","pct":3,"idx":1.8},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":45,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":26,"idx":0.9}],"Food & drink":[{"label":"cooking","verb":"interest","pct":52,"idx":1.1},{"label":"eating out","verb":"interest","pct":56,"idx":1.0},{"label":"food & drink","verb":"interest","pct":65,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":66,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":54,"idx":1.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":32,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":28,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":18,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":27,"idx":1.0},{"label":"fashion","verb":"interest","pct":35,"idx":1.6},{"label":"fitness & exercise","verb":"interest","pct":39,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":40,"idx":1.2},{"label":"skincare","verb":"interest","pct":40,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":15,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":25,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":27,"idx":1.0},{"label":"travel","verb":"interest","pct":53,"idx":1.1}]}},"Nigeria":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":27,"idx":0.8},{"label":"American football","verb":"follow","pct":9,"idx":0.4},{"label":"athletics","verb":"follow","pct":17,"idx":1.0},{"label":"badminton","verb":"follow","pct":2,"idx":1.2},{"label":"baseball","verb":"follow","pct":4,"idx":1.2},{"label":"basketball","verb":"follow","pct":21,"idx":0.6},{"label":"boxing","verb":"follow","pct":14,"idx":0.4},{"label":"cricket","verb":"follow","pct":2,"idx":3.8},{"label":"cycling","verb":"follow","pct":6,"idx":0.5},{"label":"field hockey","verb":"follow","pct":1,"idx":0.5},{"label":"golf","verb":"follow","pct":7,"idx":0.7},{"label":"gymnastics","verb":"follow","pct":23,"idx":1.2},{"label":"horse-racing / equestrian events","verb":"follow","pct":3,"idx":0.9},{"label":"ice hockey","verb":"follow","pct":2,"idx":0.8},{"label":"long-distance running","verb":"follow","pct":10,"idx":1.0},{"label":"martial arts","verb":"follow","pct":8,"idx":0.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":13,"idx":0.6},{"label":"netball","verb":"follow","pct":2,"idx":0.9},{"label":"polo","verb":"follow","pct":1,"idx":0.5},{"label":"rowing","verb":"follow","pct":1,"idx":0.9},{"label":"rugby","verb":"follow","pct":2,"idx":1.0},{"label":"sailing","verb":"follow","pct":2,"idx":0.5},{"label":"skateboarding","verb":"follow","pct":3,"idx":0.9},{"label":"soccer","verb":"follow","pct":60,"idx":0.7},{"label":"surfing","verb":"follow","pct":2,"idx":0.7},{"label":"swimming / diving","verb":"follow","pct":12,"idx":0.8},{"label":"table tennis","verb":"follow","pct":9,"idx":0.5},{"label":"tennis","verb":"follow","pct":14,"idx":0.6},{"label":"triathlon","verb":"follow","pct":1,"idx":0.3},{"label":"volleyball","verb":"follow","pct":5,"idx":0.9},{"label":"winter sports","verb":"follow","pct":5,"idx":0.7},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":31,"idx":0.7},{"label":"squash","verb":"follow","pct":1,"idx":2.0},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":35,"idx":0.9},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":3,"idx":0.6}],"Food & drink":[{"label":"cooking","verb":"interest","pct":58,"idx":1.5},{"label":"eating out","verb":"interest","pct":27,"idx":1.4},{"label":"food & drink","verb":"interest","pct":71,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":67,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":51,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":44,"idx":1.2},{"label":"cars / motoring","verb":"interest","pct":23,"idx":0.8},{"label":"charities / volunteering","verb":"interest","pct":30,"idx":0.8},{"label":"DIY / home improvements","verb":"interest","pct":42,"idx":0.8},{"label":"fashion","verb":"interest","pct":49,"idx":1.1},{"label":"fitness & exercise","verb":"interest","pct":29,"idx":0.7},{"label":"pets / pet care","verb":"interest","pct":11,"idx":0.8},{"label":"skincare","verb":"interest","pct":40,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":15,"idx":0.6},{"label":"museums / galleries","verb":"interest","pct":43,"idx":1.6},{"label":"outdoor activities","verb":"interest","pct":31,"idx":1.3},{"label":"travel","verb":"interest","pct":25,"idx":0.8}]}},"Norway":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":21,"idx":1.3},{"label":"American football","verb":"follow","pct":14,"idx":2.1},{"label":"athletics","verb":"follow","pct":26,"idx":0.8},{"label":"badminton","verb":"follow","pct":7,"idx":2.5},{"label":"baseball","verb":"follow","pct":7,"idx":2.3},{"label":"basketball","verb":"follow","pct":24,"idx":2.0},{"label":"boxing","verb":"follow","pct":20,"idx":2.5},{"label":"cricket","verb":"follow","pct":3,"idx":2.0},{"label":"cycling","verb":"follow","pct":24,"idx":1.1},{"label":"field hockey","verb":"follow","pct":2,"idx":2.6},{"label":"golf","verb":"follow","pct":17,"idx":1.7},{"label":"gymnastics","verb":"follow","pct":8,"idx":1.9},{"label":"handball","verb":"follow","pct":36,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":1.6},{"label":"ice hockey","verb":"follow","pct":14,"idx":1.3},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.0},{"label":"martial arts","verb":"follow","pct":20,"idx":2.1},{"label":"motor sports (e.g. F1)","verb":"follow","pct":29,"idx":1.5},{"label":"netball","verb":"follow","pct":2,"idx":4.2},{"label":"polo","verb":"follow","pct":2,"idx":2.7},{"label":"rowing","verb":"follow","pct":4,"idx":1.8},{"label":"rugby","verb":"follow","pct":5,"idx":2.4},{"label":"sailing","verb":"follow","pct":5,"idx":1.9},{"label":"skateboarding","verb":"follow","pct":3,"idx":2.0},{"label":"soccer","verb":"follow","pct":70,"idx":1.1},{"label":"surfing","verb":"follow","pct":4,"idx":2.2},{"label":"swimming / diving","verb":"follow","pct":14,"idx":1.5},{"label":"table tennis","verb":"follow","pct":8,"idx":2.5},{"label":"tennis","verb":"follow","pct":24,"idx":1.4},{"label":"triathlon","verb":"follow","pct":5,"idx":1.4},{"label":"volleyball","verb":"follow","pct":9,"idx":1.9},{"label":"winter sports","verb":"follow","pct":45,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":12,"idx":2.2},{"label":"squash","verb":"follow","pct":1,"idx":1.6},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":37,"idx":0.9},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":26,"idx":0.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":51,"idx":1.1},{"label":"eating out","verb":"interest","pct":45,"idx":1.0},{"label":"food & drink","verb":"interest","pct":58,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":64,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":52,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":32,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":27,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":20,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":35,"idx":1.0},{"label":"fashion","verb":"interest","pct":28,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":41,"idx":1.0},{"label":"pets / pet care","verb":"interest","pct":39,"idx":1.3},{"label":"skincare","verb":"interest","pct":36,"idx":1.7}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":16,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":24,"idx":0.9},{"label":"outdoor activities","verb":"interest","pct":39,"idx":0.9},{"label":"travel","verb":"interest","pct":53,"idx":0.9}]}},"Poland":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":24,"idx":1.5},{"label":"American football","verb":"follow","pct":9,"idx":1.9},{"label":"athletics","verb":"follow","pct":33,"idx":1.1},{"label":"badminton","verb":"follow","pct":6,"idx":1.9},{"label":"baseball","verb":"follow","pct":5,"idx":1.9},{"label":"basketball","verb":"follow","pct":37,"idx":1.6},{"label":"boxing","verb":"follow","pct":28,"idx":2.1},{"label":"cricket","verb":"follow","pct":1,"idx":2.0},{"label":"cycling","verb":"follow","pct":22,"idx":1.3},{"label":"field hockey","verb":"follow","pct":2,"idx":1.9},{"label":"golf","verb":"follow","pct":12,"idx":1.9},{"label":"gymnastics","verb":"follow","pct":14,"idx":1.7},{"label":"handball","verb":"follow","pct":26,"idx":1.5},{"label":"horse-racing / equestrian events","verb":"follow","pct":5,"idx":1.6},{"label":"ice hockey","verb":"follow","pct":10,"idx":1.3},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.8},{"label":"martial arts","verb":"follow","pct":25,"idx":2.0},{"label":"motor sports (e.g. F1)","verb":"follow","pct":29,"idx":1.6},{"label":"netball","verb":"follow","pct":1,"idx":1.4},{"label":"polo","verb":"follow","pct":1,"idx":2.6},{"label":"rowing","verb":"follow","pct":4,"idx":1.4},{"label":"rugby","verb":"follow","pct":5,"idx":1.6},{"label":"sailing","verb":"follow","pct":4,"idx":1.2},{"label":"skateboarding","verb":"follow","pct":3,"idx":1.6},{"label":"soccer","verb":"follow","pct":78,"idx":1.2},{"label":"surfing","verb":"follow","pct":4,"idx":2.1},{"label":"swimming / diving","verb":"follow","pct":15,"idx":1.6},{"label":"table tennis","verb":"follow","pct":12,"idx":2.0},{"label":"tennis","verb":"follow","pct":40,"idx":1.2},{"label":"triathlon","verb":"follow","pct":4,"idx":1.7},{"label":"volleyball","verb":"follow","pct":38,"idx":1.2},{"label":"winter sports","verb":"follow","pct":40,"idx":1.1},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":10,"idx":2.4},{"label":"squash","verb":"follow","pct":2,"idx":2.1},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":42,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":24,"idx":1.0}],"Food & drink":[{"label":"cooking","verb":"interest","pct":57,"idx":1.2},{"label":"eating out","verb":"interest","pct":35,"idx":1.3},{"label":"food & drink","verb":"interest","pct":44,"idx":1.3}],"Music & entertainment":[{"label":"music","verb":"interest","pct":63,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":56,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":42,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":33,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":15,"idx":1.6},{"label":"DIY / home improvements","verb":"interest","pct":32,"idx":1.1},{"label":"fashion","verb":"interest","pct":34,"idx":1.8},{"label":"fitness & exercise","verb":"interest","pct":33,"idx":1.3},{"label":"pets / pet care","verb":"interest","pct":44,"idx":1.3},{"label":"skincare","verb":"interest","pct":41,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":18,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":22,"idx":1.1},{"label":"outdoor activities","verb":"interest","pct":48,"idx":1.1},{"label":"travel","verb":"interest","pct":51,"idx":1.1}]}},"Portugal":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":22,"idx":1.3},{"label":"American football","verb":"follow","pct":11,"idx":1.8},{"label":"athletics","verb":"follow","pct":20,"idx":0.9},{"label":"badminton","verb":"follow","pct":5,"idx":1.9},{"label":"baseball","verb":"follow","pct":4,"idx":1.7},{"label":"basketball","verb":"follow","pct":34,"idx":1.3},{"label":"boxing","verb":"follow","pct":17,"idx":1.9},{"label":"cricket","verb":"follow","pct":1,"idx":1.0},{"label":"cycling","verb":"follow","pct":27,"idx":0.9},{"label":"field hockey","verb":"follow","pct":2,"idx":1.2},{"label":"golf","verb":"follow","pct":8,"idx":1.4},{"label":"gymnastics","verb":"follow","pct":20,"idx":1.4},{"label":"handball","verb":"follow","pct":14,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":4,"idx":1.7},{"label":"ice hockey","verb":"follow","pct":6,"idx":1.7},{"label":"long-distance running","verb":"follow","pct":6,"idx":0.9},{"label":"martial arts","verb":"follow","pct":19,"idx":1.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":42,"idx":1.2},{"label":"polo","verb":"follow","pct":1,"idx":2.0},{"label":"rowing","verb":"follow","pct":3,"idx":1.0},{"label":"rugby","verb":"follow","pct":6,"idx":0.9},{"label":"sailing","verb":"follow","pct":3,"idx":1.2},{"label":"skateboarding","verb":"follow","pct":7,"idx":1.6},{"label":"soccer","verb":"follow","pct":84,"idx":1.1},{"label":"surfing","verb":"follow","pct":11,"idx":1.4},{"label":"swimming / diving","verb":"follow","pct":19,"idx":1.2},{"label":"table tennis","verb":"follow","pct":5,"idx":1.2},{"label":"tennis","verb":"follow","pct":28,"idx":1.0},{"label":"triathlon","verb":"follow","pct":5,"idx":1.1},{"label":"volleyball","verb":"follow","pct":15,"idx":1.5},{"label":"winter sports","verb":"follow","pct":22,"idx":1.2},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":14,"idx":1.9},{"label":"squash","verb":"follow","pct":1,"idx":1.4},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":48,"idx":1.0},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":19,"idx":1.2}],"Food & drink":[{"label":"cooking","verb":"interest","pct":60,"idx":1.1},{"label":"eating out","verb":"interest","pct":60,"idx":1.1},{"label":"food & drink","verb":"interest","pct":49,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":71,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":68,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":42,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":30,"idx":1.2},{"label":"charities / volunteering","verb":"interest","pct":23,"idx":1.4},{"label":"DIY / home improvements","verb":"interest","pct":45,"idx":1.2},{"label":"fashion","verb":"interest","pct":36,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":43,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":48,"idx":1.2},{"label":"skincare","verb":"interest","pct":46,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":22,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":32,"idx":0.9},{"label":"outdoor activities","verb":"interest","pct":45,"idx":1.1},{"label":"travel","verb":"interest","pct":58,"idx":1.1}]}},"Romania":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":19,"idx":1.2},{"label":"American football","verb":"follow","pct":11,"idx":1.7},{"label":"athletics","verb":"follow","pct":21,"idx":1.0},{"label":"badminton","verb":"follow","pct":6,"idx":1.3},{"label":"baseball","verb":"follow","pct":7,"idx":2.1},{"label":"basketball","verb":"follow","pct":28,"idx":1.4},{"label":"boxing","verb":"follow","pct":26,"idx":2.0},{"label":"cricket","verb":"follow","pct":1,"idx":1.4},{"label":"cycling","verb":"follow","pct":24,"idx":1.1},{"label":"field hockey","verb":"follow","pct":2,"idx":2.7},{"label":"golf","verb":"follow","pct":10,"idx":1.9},{"label":"gymnastics","verb":"follow","pct":32,"idx":1.1},{"label":"handball","verb":"follow","pct":27,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":1.2},{"label":"ice hockey","verb":"follow","pct":8,"idx":1.5},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.3},{"label":"martial arts","verb":"follow","pct":19,"idx":1.7},{"label":"motor sports (e.g. F1)","verb":"follow","pct":34,"idx":1.2},{"label":"netball","verb":"follow","pct":1,"idx":2.0},{"label":"polo","verb":"follow","pct":1,"idx":0.8},{"label":"rowing","verb":"follow","pct":10,"idx":0.9},{"label":"rugby","verb":"follow","pct":8,"idx":0.9},{"label":"sailing","verb":"follow","pct":2,"idx":1.2},{"label":"skateboarding","verb":"follow","pct":3,"idx":1.7},{"label":"soccer","verb":"follow","pct":76,"idx":1.2},{"label":"surfing","verb":"follow","pct":4,"idx":1.9},{"label":"swimming / diving","verb":"follow","pct":18,"idx":0.9},{"label":"table tennis","verb":"follow","pct":18,"idx":1.3},{"label":"tennis","verb":"follow","pct":44,"idx":1.0},{"label":"triathlon","verb":"follow","pct":3,"idx":0.8},{"label":"volleyball","verb":"follow","pct":11,"idx":1.5},{"label":"winter sports","verb":"follow","pct":27,"idx":1.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":13,"idx":2.4},{"label":"squash","verb":"follow","pct":1,"idx":1.7},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":35,"idx":0.9},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":19,"idx":1.0}],"Food & drink":[{"label":"cooking","verb":"interest","pct":60,"idx":1.1},{"label":"eating out","verb":"interest","pct":28,"idx":1.1},{"label":"food & drink","verb":"interest","pct":39,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":63,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":52,"idx":1.0}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":36,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":31,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":15,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":37,"idx":0.9},{"label":"fashion","verb":"interest","pct":26,"idx":1.6},{"label":"fitness & exercise","verb":"interest","pct":27,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":39,"idx":1.2},{"label":"skincare","verb":"interest","pct":38,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":26,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":29,"idx":0.9},{"label":"outdoor activities","verb":"interest","pct":44,"idx":0.9},{"label":"travel","verb":"interest","pct":47,"idx":0.9}]}},"Saudi Arabia":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":28,"idx":1.6},{"label":"American football","verb":"follow","pct":24,"idx":1.4},{"label":"athletics","verb":"follow","pct":21,"idx":1.4},{"label":"badminton","verb":"follow","pct":8,"idx":1.2},{"label":"baseball","verb":"follow","pct":8,"idx":1.2},{"label":"basketball","verb":"follow","pct":34,"idx":1.2},{"label":"boxing","verb":"follow","pct":26,"idx":1.3},{"label":"cricket","verb":"follow","pct":13,"idx":0.9},{"label":"cycling","verb":"follow","pct":20,"idx":1.4},{"label":"field hockey","verb":"follow","pct":2,"idx":0.9},{"label":"golf","verb":"follow","pct":17,"idx":1.3},{"label":"gymnastics","verb":"follow","pct":8,"idx":1.5},{"label":"horse-racing / equestrian events","verb":"follow","pct":14,"idx":2.0},{"label":"ice hockey","verb":"follow","pct":6,"idx":1.4},{"label":"long-distance running","verb":"follow","pct":10,"idx":2.5},{"label":"martial arts","verb":"follow","pct":19,"idx":1.2},{"label":"motor sports (e.g. F1)","verb":"follow","pct":43,"idx":1.4},{"label":"netball","verb":"follow","pct":3,"idx":1.4},{"label":"polo","verb":"follow","pct":2,"idx":1.7},{"label":"rowing","verb":"follow","pct":3,"idx":1.0},{"label":"rugby","verb":"follow","pct":5,"idx":1.4},{"label":"sailing","verb":"follow","pct":4,"idx":1.4},{"label":"skateboarding","verb":"follow","pct":9,"idx":1.7},{"label":"soccer","verb":"follow","pct":88,"idx":1.2},{"label":"surfing","verb":"follow","pct":8,"idx":1.7},{"label":"swimming / diving","verb":"follow","pct":26,"idx":1.6},{"label":"table tennis","verb":"follow","pct":17,"idx":1.4},{"label":"tennis","verb":"follow","pct":29,"idx":1.1},{"label":"triathlon","verb":"follow","pct":2,"idx":2.9},{"label":"volleyball","verb":"follow","pct":16,"idx":1.5},{"label":"winter sports","verb":"follow","pct":12,"idx":1.4},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":34,"idx":1.4},{"label":"squash","verb":"follow","pct":2,"idx":1.1},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":56,"idx":1.4},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":7,"idx":1.5}],"Food & drink":[{"label":"cooking","verb":"interest","pct":49,"idx":1.2},{"label":"eating out","verb":"interest","pct":41,"idx":1.4},{"label":"food & drink","verb":"interest","pct":52,"idx":1.4}],"Music & entertainment":[{"label":"music","verb":"interest","pct":35,"idx":1.3},{"label":"films / cinema","verb":"interest","pct":45,"idx":1.3}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":26,"idx":1.3},{"label":"cars / motoring","verb":"interest","pct":32,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":24,"idx":1.5},{"label":"DIY / home improvements","verb":"interest","pct":28,"idx":1.2},{"label":"fashion","verb":"interest","pct":35,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":36,"idx":1.4},{"label":"pets / pet care","verb":"interest","pct":20,"idx":1.4},{"label":"skincare","verb":"interest","pct":40,"idx":1.8}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":29,"idx":1.5},{"label":"museums / galleries","verb":"interest","pct":26,"idx":1.3},{"label":"outdoor activities","verb":"interest","pct":25,"idx":1.5},{"label":"travel","verb":"interest","pct":43,"idx":1.3}]}},"Serbia":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":24,"idx":1.1},{"label":"American football","verb":"follow","pct":10,"idx":1.3},{"label":"athletics","verb":"follow","pct":36,"idx":0.9},{"label":"badminton","verb":"follow","pct":3,"idx":1.3},{"label":"baseball","verb":"follow","pct":2,"idx":1.4},{"label":"basketball","verb":"follow","pct":70,"idx":1.0},{"label":"boxing","verb":"follow","pct":20,"idx":1.7},{"label":"cricket","verb":"follow","pct":1,"idx":1.5},{"label":"cycling","verb":"follow","pct":15,"idx":1.1},{"label":"golf","verb":"follow","pct":5,"idx":1.6},{"label":"gymnastics","verb":"follow","pct":22,"idx":1.1},{"label":"handball","verb":"follow","pct":14,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":5,"idx":1.5},{"label":"ice hockey","verb":"follow","pct":4,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":6,"idx":1.2},{"label":"martial arts","verb":"follow","pct":22,"idx":1.7},{"label":"motor sports (e.g. F1)","verb":"follow","pct":28,"idx":1.1},{"label":"netball","verb":"follow","pct":0,"idx":2.0},{"label":"polo","verb":"follow","pct":0,"idx":1.2},{"label":"rowing","verb":"follow","pct":4,"idx":1.2},{"label":"rugby","verb":"follow","pct":4,"idx":1.5},{"label":"sailing","verb":"follow","pct":3,"idx":1.2},{"label":"skateboarding","verb":"follow","pct":2,"idx":1.2},{"label":"soccer","verb":"follow","pct":74,"idx":1.1},{"label":"surfing","verb":"follow","pct":3,"idx":1.7},{"label":"swimming / diving","verb":"follow","pct":24,"idx":1.0},{"label":"table tennis","verb":"follow","pct":12,"idx":1.6},{"label":"tennis","verb":"follow","pct":64,"idx":1.1},{"label":"triathlon","verb":"follow","pct":3,"idx":0.9},{"label":"volleyball","verb":"follow","pct":29,"idx":1.1},{"label":"winter sports","verb":"follow","pct":36,"idx":1.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":6,"idx":2.0},{"label":"squash","verb":"follow","pct":0,"idx":0.7},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":47,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":29,"idx":1.0}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.1},{"label":"eating out","verb":"interest","pct":31,"idx":1.2},{"label":"food & drink","verb":"interest","pct":58,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":69,"idx":1.0},{"label":"films / cinema","verb":"interest","pct":58,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":48,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":36,"idx":1.2},{"label":"charities / volunteering","verb":"interest","pct":15,"idx":1.1},{"label":"DIY / home improvements","verb":"interest","pct":52,"idx":1.0},{"label":"fashion","verb":"interest","pct":31,"idx":1.6},{"label":"fitness & exercise","verb":"interest","pct":34,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":44,"idx":1.1},{"label":"skincare","verb":"interest","pct":41,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":25,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":27,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":37,"idx":1.0},{"label":"travel","verb":"interest","pct":63,"idx":1.1}]}},"South Africa":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":34,"idx":1.2},{"label":"American football","verb":"follow","pct":21,"idx":1.9},{"label":"athletics","verb":"follow","pct":41,"idx":1.2},{"label":"badminton","verb":"follow","pct":1,"idx":0.8},{"label":"baseball","verb":"follow","pct":8,"idx":2.0},{"label":"basketball","verb":"follow","pct":39,"idx":1.6},{"label":"boxing","verb":"follow","pct":33,"idx":1.2},{"label":"cricket","verb":"follow","pct":41,"idx":1.0},{"label":"cycling","verb":"follow","pct":19,"idx":1.3},{"label":"field hockey","verb":"follow","pct":3,"idx":1.1},{"label":"golf","verb":"follow","pct":21,"idx":1.2},{"label":"gymnastics","verb":"follow","pct":18,"idx":1.2},{"label":"horse-racing / equestrian events","verb":"follow","pct":8,"idx":1.5},{"label":"ice hockey","verb":"follow","pct":5,"idx":1.6},{"label":"long-distance running","verb":"follow","pct":19,"idx":1.4},{"label":"martial arts","verb":"follow","pct":29,"idx":1.0},{"label":"motor sports (e.g. F1)","verb":"follow","pct":44,"idx":1.0},{"label":"netball","verb":"follow","pct":17,"idx":2.5},{"label":"polo","verb":"follow","pct":1,"idx":1.3},{"label":"rowing","verb":"follow","pct":2,"idx":1.2},{"label":"rugby","verb":"follow","pct":67,"idx":1.1},{"label":"sailing","verb":"follow","pct":3,"idx":1.1},{"label":"skateboarding","verb":"follow","pct":8,"idx":1.2},{"label":"soccer","verb":"follow","pct":88,"idx":1.2},{"label":"surfing","verb":"follow","pct":8,"idx":1.1},{"label":"swimming / diving","verb":"follow","pct":29,"idx":1.4},{"label":"table tennis","verb":"follow","pct":8,"idx":1.6},{"label":"tennis","verb":"follow","pct":32,"idx":1.1},{"label":"triathlon","verb":"follow","pct":3,"idx":0.9},{"label":"volleyball","verb":"follow","pct":7,"idx":1.8},{"label":"winter sports","verb":"follow","pct":20,"idx":1.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":46,"idx":1.8},{"label":"squash","verb":"follow","pct":2,"idx":0.7},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":54,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":16,"idx":0.9}],"Food & drink":[{"label":"cooking","verb":"interest","pct":68,"idx":1.2},{"label":"eating out","verb":"interest","pct":56,"idx":1.3},{"label":"food & drink","verb":"interest","pct":72,"idx":1.3}],"Music & entertainment":[{"label":"music","verb":"interest","pct":76,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":45,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":40,"idx":1.0},{"label":"cars / motoring","verb":"interest","pct":43,"idx":1.1},{"label":"charities / volunteering","verb":"interest","pct":28,"idx":1.3},{"label":"DIY / home improvements","verb":"interest","pct":50,"idx":1.1},{"label":"fashion","verb":"interest","pct":46,"idx":1.6},{"label":"fitness & exercise","verb":"interest","pct":55,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":32,"idx":0.9},{"label":"skincare","verb":"interest","pct":52,"idx":1.6}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":24,"idx":1.3},{"label":"museums / galleries","verb":"interest","pct":32,"idx":1.2},{"label":"outdoor activities","verb":"interest","pct":48,"idx":1.1},{"label":"travel","verb":"interest","pct":51,"idx":1.2}]}},"Spain":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":22,"idx":1.7},{"label":"American football","verb":"follow","pct":10,"idx":1.8},{"label":"athletics","verb":"follow","pct":23,"idx":1.1},{"label":"badminton","verb":"follow","pct":4,"idx":1.7},{"label":"baseball","verb":"follow","pct":8,"idx":2.4},{"label":"basketball","verb":"follow","pct":44,"idx":1.3},{"label":"boxing","verb":"follow","pct":21,"idx":2.3},{"label":"cricket","verb":"follow","pct":1,"idx":1.6},{"label":"cycling","verb":"follow","pct":38,"idx":1.2},{"label":"field hockey","verb":"follow","pct":1,"idx":1.4},{"label":"golf","verb":"follow","pct":11,"idx":1.4},{"label":"gymnastics","verb":"follow","pct":20,"idx":1.5},{"label":"handball","verb":"follow","pct":11,"idx":1.1},{"label":"horse-racing / equestrian events","verb":"follow","pct":4,"idx":2.0},{"label":"ice hockey","verb":"follow","pct":4,"idx":1.8},{"label":"long-distance running","verb":"follow","pct":5,"idx":1.2},{"label":"martial arts","verb":"follow","pct":20,"idx":2.0},{"label":"motor sports (e.g. F1)","verb":"follow","pct":47,"idx":1.3},{"label":"netball","verb":"follow","pct":1,"idx":1.5},{"label":"polo","verb":"follow","pct":1,"idx":1.5},{"label":"rowing","verb":"follow","pct":3,"idx":1.3},{"label":"rugby","verb":"follow","pct":6,"idx":1.1},{"label":"sailing","verb":"follow","pct":3,"idx":1.4},{"label":"skateboarding","verb":"follow","pct":3,"idx":1.8},{"label":"soccer","verb":"follow","pct":80,"idx":1.2},{"label":"surfing","verb":"follow","pct":7,"idx":1.9},{"label":"swimming / diving","verb":"follow","pct":21,"idx":1.4},{"label":"table tennis","verb":"follow","pct":6,"idx":1.8},{"label":"tennis","verb":"follow","pct":46,"idx":1.1},{"label":"triathlon","verb":"follow","pct":5,"idx":1.2},{"label":"volleyball","verb":"follow","pct":10,"idx":2.2},{"label":"winter sports","verb":"follow","pct":24,"idx":1.3},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":12,"idx":2.4},{"label":"squash","verb":"follow","pct":1,"idx":1.4},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":46,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":20,"idx":1.3}],"Food & drink":[{"label":"cooking","verb":"interest","pct":58,"idx":1.2},{"label":"eating out","verb":"interest","pct":59,"idx":1.1},{"label":"food & drink","verb":"interest","pct":58,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":67,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":69,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":47,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":31,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":16,"idx":1.3},{"label":"DIY / home improvements","verb":"interest","pct":32,"idx":1.1},{"label":"fashion","verb":"interest","pct":39,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":39,"idx":1.3},{"label":"pets / pet care","verb":"interest","pct":39,"idx":1.4},{"label":"skincare","verb":"interest","pct":36,"idx":1.4}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":21,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":35,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":42,"idx":1.1},{"label":"travel","verb":"interest","pct":62,"idx":1.1}]}},"Sweden":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":23,"idx":1.4},{"label":"American football","verb":"follow","pct":14,"idx":2.2},{"label":"athletics","verb":"follow","pct":32,"idx":0.8},{"label":"badminton","verb":"follow","pct":8,"idx":2.2},{"label":"baseball","verb":"follow","pct":6,"idx":2.5},{"label":"basketball","verb":"follow","pct":26,"idx":2.4},{"label":"boxing","verb":"follow","pct":20,"idx":2.8},{"label":"cricket","verb":"follow","pct":3,"idx":2.6},{"label":"cycling","verb":"follow","pct":16,"idx":1.3},{"label":"field hockey","verb":"follow","pct":2,"idx":2.3},{"label":"golf","verb":"follow","pct":21,"idx":1.5},{"label":"gymnastics","verb":"follow","pct":13,"idx":1.7},{"label":"handball","verb":"follow","pct":25,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":10,"idx":1.1},{"label":"ice hockey","verb":"follow","pct":39,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":7,"idx":1.3},{"label":"martial arts","verb":"follow","pct":22,"idx":2.7},{"label":"motor sports (e.g. F1)","verb":"follow","pct":31,"idx":1.7},{"label":"netball","verb":"follow","pct":1,"idx":2.2},{"label":"polo","verb":"follow","pct":2,"idx":2.4},{"label":"rowing","verb":"follow","pct":2,"idx":1.6},{"label":"rugby","verb":"follow","pct":4,"idx":1.7},{"label":"sailing","verb":"follow","pct":4,"idx":1.4},{"label":"skateboarding","verb":"follow","pct":5,"idx":2.6},{"label":"soccer","verb":"follow","pct":71,"idx":1.3},{"label":"surfing","verb":"follow","pct":4,"idx":2.1},{"label":"swimming / diving","verb":"follow","pct":18,"idx":1.0},{"label":"table tennis","verb":"follow","pct":15,"idx":1.0},{"label":"tennis","verb":"follow","pct":28,"idx":1.6},{"label":"triathlon","verb":"follow","pct":4,"idx":1.3},{"label":"volleyball","verb":"follow","pct":8,"idx":1.3},{"label":"winter sports","verb":"follow","pct":38,"idx":0.8},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":11,"idx":2.9},{"label":"squash","verb":"follow","pct":2,"idx":2.0},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":41,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":25,"idx":0.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.1},{"label":"eating out","verb":"interest","pct":53,"idx":1.1},{"label":"food & drink","verb":"interest","pct":62,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":68,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":53,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":38,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":26,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":19,"idx":1.3},{"label":"DIY / home improvements","verb":"interest","pct":38,"idx":1.1},{"label":"fashion","verb":"interest","pct":35,"idx":2.0},{"label":"fitness & exercise","verb":"interest","pct":38,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":37,"idx":1.2},{"label":"skincare","verb":"interest","pct":39,"idx":1.6}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":27,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":29,"idx":0.9},{"label":"outdoor activities","verb":"interest","pct":32,"idx":1.0},{"label":"travel","verb":"interest","pct":55,"idx":1.0}]}},"Switzerland":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":21,"idx":1.4},{"label":"American football","verb":"follow","pct":15,"idx":2.0},{"label":"athletics","verb":"follow","pct":22,"idx":0.8},{"label":"badminton","verb":"follow","pct":7,"idx":1.7},{"label":"baseball","verb":"follow","pct":9,"idx":2.7},{"label":"basketball","verb":"follow","pct":31,"idx":2.1},{"label":"boxing","verb":"follow","pct":22,"idx":2.5},{"label":"cricket","verb":"follow","pct":2,"idx":1.9},{"label":"cycling","verb":"follow","pct":27,"idx":1.0},{"label":"field hockey","verb":"follow","pct":2,"idx":2.4},{"label":"golf","verb":"follow","pct":17,"idx":2.1},{"label":"gymnastics","verb":"follow","pct":17,"idx":1.5},{"label":"handball","verb":"follow","pct":10,"idx":1.4},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":1.1},{"label":"ice hockey","verb":"follow","pct":26,"idx":0.9},{"label":"long-distance running","verb":"follow","pct":6,"idx":0.9},{"label":"martial arts","verb":"follow","pct":19,"idx":2.2},{"label":"motor sports (e.g. F1)","verb":"follow","pct":39,"idx":1.4},{"label":"netball","verb":"follow","pct":2,"idx":1.9},{"label":"polo","verb":"follow","pct":2,"idx":1.6},{"label":"rowing","verb":"follow","pct":3,"idx":1.0},{"label":"rugby","verb":"follow","pct":9,"idx":1.2},{"label":"sailing","verb":"follow","pct":6,"idx":1.0},{"label":"skateboarding","verb":"follow","pct":6,"idx":1.8},{"label":"soccer","verb":"follow","pct":78,"idx":1.3},{"label":"surfing","verb":"follow","pct":7,"idx":1.9},{"label":"swimming / diving","verb":"follow","pct":21,"idx":1.4},{"label":"table tennis","verb":"follow","pct":11,"idx":1.8},{"label":"tennis","verb":"follow","pct":43,"idx":1.2},{"label":"triathlon","verb":"follow","pct":6,"idx":1.2},{"label":"volleyball","verb":"follow","pct":13,"idx":1.9},{"label":"winter sports","verb":"follow","pct":43,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":14,"idx":2.8},{"label":"squash","verb":"follow","pct":2,"idx":1.8},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":51,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":29,"idx":0.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":57,"idx":1.0},{"label":"eating out","verb":"interest","pct":50,"idx":1.0},{"label":"food & drink","verb":"interest","pct":56,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":64,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":56,"idx":1.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":39,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":34,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":15,"idx":1.0},{"label":"DIY / home improvements","verb":"interest","pct":31,"idx":1.1},{"label":"fashion","verb":"interest","pct":34,"idx":1.8},{"label":"fitness & exercise","verb":"interest","pct":42,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":38,"idx":1.2},{"label":"skincare","verb":"interest","pct":42,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":24,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":29,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":38,"idx":0.9},{"label":"travel","verb":"interest","pct":60,"idx":1.0}]}},"Turkey":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":28,"idx":1.3},{"label":"American football","verb":"follow","pct":13,"idx":1.9},{"label":"athletics","verb":"follow","pct":28,"idx":1.2},{"label":"badminton","verb":"follow","pct":7,"idx":1.6},{"label":"baseball","verb":"follow","pct":7,"idx":2.5},{"label":"basketball","verb":"follow","pct":65,"idx":1.2},{"label":"boxing","verb":"follow","pct":32,"idx":1.6},{"label":"cricket","verb":"follow","pct":1,"idx":1.7},{"label":"cycling","verb":"follow","pct":32,"idx":1.3},{"label":"field hockey","verb":"follow","pct":1,"idx":1.9},{"label":"golf","verb":"follow","pct":16,"idx":1.9},{"label":"gymnastics","verb":"follow","pct":16,"idx":1.3},{"label":"handball","verb":"follow","pct":9,"idx":1.9},{"label":"horse-racing / equestrian events","verb":"follow","pct":11,"idx":1.4},{"label":"ice hockey","verb":"follow","pct":8,"idx":1.8},{"label":"long-distance running","verb":"follow","pct":9,"idx":1.3},{"label":"martial arts","verb":"follow","pct":28,"idx":1.6},{"label":"motor sports (e.g. F1)","verb":"follow","pct":42,"idx":1.2},{"label":"netball","verb":"follow","pct":1,"idx":2.8},{"label":"polo","verb":"follow","pct":2,"idx":2.0},{"label":"rowing","verb":"follow","pct":4,"idx":1.6},{"label":"rugby","verb":"follow","pct":4,"idx":1.5},{"label":"sailing","verb":"follow","pct":6,"idx":1.3},{"label":"skateboarding","verb":"follow","pct":7,"idx":2.1},{"label":"soccer","verb":"follow","pct":87,"idx":1.1},{"label":"surfing","verb":"follow","pct":7,"idx":1.5},{"label":"swimming / diving","verb":"follow","pct":35,"idx":1.2},{"label":"table tennis","verb":"follow","pct":22,"idx":1.5},{"label":"tennis","verb":"follow","pct":35,"idx":1.2},{"label":"triathlon","verb":"follow","pct":2,"idx":1.0},{"label":"volleyball","verb":"follow","pct":45,"idx":1.2},{"label":"winter sports","verb":"follow","pct":24,"idx":1.1},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":19,"idx":1.5},{"label":"squash","verb":"follow","pct":1,"idx":0.9},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":46,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":17,"idx":1.1}],"Food & drink":[{"label":"cooking","verb":"interest","pct":57,"idx":1.0},{"label":"eating out","verb":"interest","pct":36,"idx":1.0},{"label":"food & drink","verb":"interest","pct":60,"idx":1.1}],"Music & entertainment":[{"label":"music","verb":"interest","pct":63,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":61,"idx":1.0}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":38,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":43,"idx":1.2},{"label":"charities / volunteering","verb":"interest","pct":27,"idx":1.2},{"label":"DIY / home improvements","verb":"interest","pct":39,"idx":1.1},{"label":"fashion","verb":"interest","pct":36,"idx":1.3},{"label":"fitness & exercise","verb":"interest","pct":28,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":35,"idx":1.1},{"label":"skincare","verb":"interest","pct":42,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":30,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":34,"idx":1.1},{"label":"outdoor activities","verb":"interest","pct":39,"idx":1.0},{"label":"travel","verb":"interest","pct":44,"idx":1.0}]}},"UAE":{"region":"METAP","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":30,"idx":1.8},{"label":"American football","verb":"follow","pct":27,"idx":1.5},{"label":"athletics","verb":"follow","pct":28,"idx":1.6},{"label":"badminton","verb":"follow","pct":20,"idx":1.1},{"label":"baseball","verb":"follow","pct":11,"idx":1.2},{"label":"basketball","verb":"follow","pct":50,"idx":1.4},{"label":"boxing","verb":"follow","pct":36,"idx":1.6},{"label":"cricket","verb":"follow","pct":44,"idx":1.1},{"label":"cycling","verb":"follow","pct":29,"idx":1.3},{"label":"field hockey","verb":"follow","pct":3,"idx":1.1},{"label":"golf","verb":"follow","pct":22,"idx":1.4},{"label":"gymnastics","verb":"follow","pct":15,"idx":1.8},{"label":"horse-racing / equestrian events","verb":"follow","pct":13,"idx":1.8},{"label":"ice hockey","verb":"follow","pct":8,"idx":1.3},{"label":"long-distance running","verb":"follow","pct":11,"idx":1.8},{"label":"martial arts","verb":"follow","pct":31,"idx":1.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":46,"idx":1.4},{"label":"netball","verb":"follow","pct":3,"idx":1.3},{"label":"polo","verb":"follow","pct":2,"idx":1.3},{"label":"rowing","verb":"follow","pct":4,"idx":1.0},{"label":"rugby","verb":"follow","pct":9,"idx":1.3},{"label":"sailing","verb":"follow","pct":5,"idx":1.1},{"label":"skateboarding","verb":"follow","pct":9,"idx":1.4},{"label":"soccer","verb":"follow","pct":88,"idx":1.1},{"label":"surfing","verb":"follow","pct":9,"idx":1.4},{"label":"swimming / diving","verb":"follow","pct":33,"idx":1.6},{"label":"table tennis","verb":"follow","pct":23,"idx":1.6},{"label":"tennis","verb":"follow","pct":39,"idx":1.1},{"label":"triathlon","verb":"follow","pct":4,"idx":1.1},{"label":"volleyball","verb":"follow","pct":20,"idx":1.7},{"label":"winter sports","verb":"follow","pct":17,"idx":1.4},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":42,"idx":1.6},{"label":"squash","verb":"follow","pct":3,"idx":0.8},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":52,"idx":1.4},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":11,"idx":1.5}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.3},{"label":"eating out","verb":"interest","pct":47,"idx":1.4},{"label":"food & drink","verb":"interest","pct":57,"idx":1.4}],"Music & entertainment":[{"label":"music","verb":"interest","pct":51,"idx":1.3},{"label":"films / cinema","verb":"interest","pct":47,"idx":1.4}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":31,"idx":1.2},{"label":"cars / motoring","verb":"interest","pct":40,"idx":1.5},{"label":"charities / volunteering","verb":"interest","pct":28,"idx":1.6},{"label":"DIY / home improvements","verb":"interest","pct":30,"idx":1.4},{"label":"fashion","verb":"interest","pct":39,"idx":1.6},{"label":"fitness & exercise","verb":"interest","pct":46,"idx":1.5},{"label":"pets / pet care","verb":"interest","pct":28,"idx":1.6},{"label":"skincare","verb":"interest","pct":40,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":26,"idx":1.4},{"label":"museums / galleries","verb":"interest","pct":34,"idx":1.5},{"label":"outdoor activities","verb":"interest","pct":37,"idx":1.3},{"label":"travel","verb":"interest","pct":51,"idx":1.4}]}},"UK":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":29,"idx":1.8},{"label":"American football","verb":"follow","pct":20,"idx":2.1},{"label":"athletics","verb":"follow","pct":28,"idx":1.1},{"label":"badminton","verb":"follow","pct":7,"idx":1.8},{"label":"baseball","verb":"follow","pct":8,"idx":2.6},{"label":"basketball","verb":"follow","pct":29,"idx":3.7},{"label":"boxing","verb":"follow","pct":33,"idx":2.2},{"label":"cricket","verb":"follow","pct":18,"idx":0.8},{"label":"cycling","verb":"follow","pct":19,"idx":1.1},{"label":"field hockey","verb":"follow","pct":2,"idx":1.1},{"label":"golf","verb":"follow","pct":25,"idx":1.2},{"label":"gymnastics","verb":"follow","pct":17,"idx":1.5},{"label":"horse-racing / equestrian events","verb":"follow","pct":11,"idx":1.2},{"label":"ice hockey","verb":"follow","pct":8,"idx":2.1},{"label":"long-distance running","verb":"follow","pct":9,"idx":1.5},{"label":"martial arts","verb":"follow","pct":21,"idx":3.0},{"label":"motor sports (e.g. F1)","verb":"follow","pct":39,"idx":1.4},{"label":"netball","verb":"follow","pct":4,"idx":2.0},{"label":"polo","verb":"follow","pct":1,"idx":1.6},{"label":"rowing","verb":"follow","pct":4,"idx":0.9},{"label":"rugby","verb":"follow","pct":28,"idx":0.9},{"label":"sailing","verb":"follow","pct":3,"idx":1.1},{"label":"skateboarding","verb":"follow","pct":6,"idx":2.5},{"label":"soccer","verb":"follow","pct":76,"idx":1.3},{"label":"surfing","verb":"follow","pct":5,"idx":2.5},{"label":"swimming / diving","verb":"follow","pct":23,"idx":1.6},{"label":"table tennis","verb":"follow","pct":12,"idx":3.2},{"label":"tennis","verb":"follow","pct":42,"idx":1.1},{"label":"triathlon","verb":"follow","pct":4,"idx":0.7},{"label":"volleyball","verb":"follow","pct":7,"idx":3.9},{"label":"winter sports","verb":"follow","pct":26,"idx":0.9},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":23,"idx":3.8},{"label":"squash","verb":"follow","pct":2,"idx":1.2},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":50,"idx":1.2},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":22,"idx":0.8}],"Food & drink":[{"label":"cooking","verb":"interest","pct":56,"idx":1.1},{"label":"eating out","verb":"interest","pct":57,"idx":1.1},{"label":"food & drink","verb":"interest","pct":67,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":67,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":60,"idx":1.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":40,"idx":0.8},{"label":"cars / motoring","verb":"interest","pct":29,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":23,"idx":1.3},{"label":"DIY / home improvements","verb":"interest","pct":38,"idx":1.2},{"label":"fashion","verb":"interest","pct":38,"idx":2.4},{"label":"fitness & exercise","verb":"interest","pct":46,"idx":1.3},{"label":"pets / pet care","verb":"interest","pct":44,"idx":1.4},{"label":"skincare","verb":"interest","pct":45,"idx":1.6}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":17,"idx":1.3},{"label":"museums / galleries","verb":"interest","pct":35,"idx":0.9},{"label":"outdoor activities","verb":"interest","pct":34,"idx":1.3},{"label":"travel","verb":"interest","pct":53,"idx":1.0}]}},"Russia":{"region":"EU","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":10,"idx":1.7},{"label":"American football","verb":"follow","pct":8,"idx":1.7},{"label":"athletics","verb":"follow","pct":12,"idx":1.5},{"label":"badminton","verb":"follow","pct":4,"idx":1.8},{"label":"baseball","verb":"follow","pct":3,"idx":2.0},{"label":"basketball","verb":"follow","pct":19,"idx":1.6},{"label":"boxing","verb":"follow","pct":23,"idx":1.6},{"label":"cricket","verb":"follow","pct":1,"idx":2.3},{"label":"cycling","verb":"follow","pct":7,"idx":1.7},{"label":"field hockey","verb":"follow","pct":1,"idx":3.3},{"label":"golf","verb":"follow","pct":4,"idx":2.1},{"label":"gymnastics","verb":"follow","pct":16,"idx":1.5},{"label":"handball","verb":"follow","pct":2,"idx":1.6},{"label":"horse-racing / equestrian events","verb":"follow","pct":3,"idx":1.7},{"label":"ice hockey","verb":"follow","pct":26,"idx":1.3},{"label":"long-distance running","verb":"follow","pct":3,"idx":1.7},{"label":"martial arts","verb":"follow","pct":18,"idx":1.4},{"label":"motor sports (e.g. F1)","verb":"follow","pct":15,"idx":1.4},{"label":"netball","verb":"follow","pct":0,"idx":4.0},{"label":"polo","verb":"follow","pct":1,"idx":2.8},{"label":"rowing","verb":"follow","pct":2,"idx":1.8},{"label":"rugby","verb":"follow","pct":2,"idx":1.9},{"label":"sailing","verb":"follow","pct":1,"idx":1.4},{"label":"skateboarding","verb":"follow","pct":2,"idx":2.2},{"label":"soccer","verb":"follow","pct":47,"idx":1.2},{"label":"surfing","verb":"follow","pct":2,"idx":1.7},{"label":"swimming / diving","verb":"follow","pct":14,"idx":1.5},{"label":"table tennis","verb":"follow","pct":8,"idx":1.9},{"label":"tennis","verb":"follow","pct":15,"idx":1.5},{"label":"triathlon","verb":"follow","pct":2,"idx":1.3},{"label":"volleyball","verb":"follow","pct":13,"idx":1.8},{"label":"winter sports","verb":"follow","pct":32,"idx":1.2},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":12,"idx":1.6},{"label":"squash","verb":"follow","pct":1,"idx":3.0},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":19,"idx":1.1},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":25,"idx":1.2}],"Food & drink":[{"label":"cooking","verb":"interest","pct":57,"idx":1.1},{"label":"eating out","verb":"interest","pct":17,"idx":1.1},{"label":"food & drink","verb":"interest","pct":48,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":61,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":62,"idx":1.1}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":39,"idx":0.9},{"label":"cars / motoring","verb":"interest","pct":26,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":10,"idx":1.4},{"label":"DIY / home improvements","verb":"interest","pct":32,"idx":1.1},{"label":"fashion","verb":"interest","pct":17,"idx":1.4},{"label":"fitness & exercise","verb":"interest","pct":26,"idx":1.0},{"label":"pets / pet care","verb":"interest","pct":43,"idx":1.2},{"label":"skincare","verb":"interest","pct":35,"idx":1.2}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":10,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":22,"idx":0.9},{"label":"outdoor activities","verb":"interest","pct":39,"idx":1.1},{"label":"travel","verb":"interest","pct":33,"idx":1.0}]}},"Global":{"region":"Global","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":22,"idx":1.4},{"label":"American football","verb":"follow","pct":19,"idx":1.0},{"label":"athletics","verb":"follow","pct":22,"idx":1.3},{"label":"badminton","verb":"follow","pct":23,"idx":1.6},{"label":"baseball","verb":"follow","pct":12,"idx":1.0},{"label":"basketball","verb":"follow","pct":45,"idx":1.5},{"label":"boxing","verb":"follow","pct":23,"idx":1.5},{"label":"cricket","verb":"follow","pct":6,"idx":0.2},{"label":"cycling","verb":"follow","pct":22,"idx":1.2},{"label":"field hockey","verb":"follow","pct":2,"idx":0.8},{"label":"golf","verb":"follow","pct":14,"idx":1.2},{"label":"gymnastics","verb":"follow","pct":18,"idx":1.5},{"label":"handball","verb":"follow","pct":2,"idx":1.0},{"label":"horse-racing / equestrian events","verb":"follow","pct":6,"idx":1.2},{"label":"ice hockey","verb":"follow","pct":7,"idx":0.9},{"label":"long-distance running","verb":"follow","pct":10,"idx":1.5},{"label":"martial arts","verb":"follow","pct":22,"idx":1.4},{"label":"motor sports (e.g. F1)","verb":"follow","pct":33,"idx":1.4},{"label":"netball","verb":"follow","pct":2,"idx":1.3},{"label":"polo","verb":"follow","pct":1,"idx":1.3},{"label":"rowing","verb":"follow","pct":3,"idx":1.1},{"label":"rugby","verb":"follow","pct":7,"idx":1.1},{"label":"sailing","verb":"follow","pct":3,"idx":1.1},{"label":"skateboarding","verb":"follow","pct":6,"idx":1.4},{"label":"soccer","verb":"follow","pct":69,"idx":1.2},{"label":"surfing","verb":"follow","pct":7,"idx":1.5},{"label":"swimming / diving","verb":"follow","pct":25,"idx":1.5},{"label":"table tennis","verb":"follow","pct":18,"idx":2.2},{"label":"tennis","verb":"follow","pct":28,"idx":1.1},{"label":"triathlon","verb":"follow","pct":4,"idx":1.3},{"label":"volleyball","verb":"follow","pct":18,"idx":1.7},{"label":"winter sports","verb":"follow","pct":25,"idx":1.2},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":18,"idx":1.1},{"label":"squash","verb":"follow","pct":1,"idx":1.0},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":34,"idx":1.3},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":20,"idx":1.2}],"Food & drink":[{"label":"cooking","verb":"interest","pct":50,"idx":1.1},{"label":"eating out","verb":"interest","pct":40,"idx":1.1},{"label":"food & drink","verb":"interest","pct":54,"idx":1.3}],"Music & entertainment":[{"label":"music","verb":"interest","pct":57,"idx":1.1},{"label":"films / cinema","verb":"interest","pct":50,"idx":1.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":36,"idx":1.0},{"label":"cars / motoring","verb":"interest","pct":32,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":20,"idx":1.3},{"label":"DIY / home improvements","verb":"interest","pct":31,"idx":1.2},{"label":"fashion","verb":"interest","pct":33,"idx":1.3},{"label":"fitness & exercise","verb":"interest","pct":40,"idx":1.2},{"label":"pets / pet care","verb":"interest","pct":31,"idx":1.2},{"label":"skincare","verb":"interest","pct":37,"idx":1.3}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":23,"idx":1.2},{"label":"museums / galleries","verb":"interest","pct":29,"idx":1.2},{"label":"outdoor activities","verb":"interest","pct":36,"idx":1.3},{"label":"travel","verb":"interest","pct":45,"idx":1.1}]}},"US":{"region":"AMS","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":27,"idx":1.6},{"label":"American football","verb":"follow","pct":68,"idx":1.1},{"label":"athletics","verb":"follow","pct":20,"idx":1.4},{"label":"badminton","verb":"follow","pct":4,"idx":1.7},{"label":"baseball","verb":"follow","pct":43,"idx":1.1},{"label":"basketball","verb":"follow","pct":58,"idx":1.4},{"label":"boxing","verb":"follow","pct":32,"idx":2.0},{"label":"cricket","verb":"follow","pct":3,"idx":1.6},{"label":"cycling","verb":"follow","pct":12,"idx":1.3},{"label":"field hockey","verb":"follow","pct":2,"idx":1.8},{"label":"golf","verb":"follow","pct":24,"idx":1.1},{"label":"gymnastics","verb":"follow","pct":24,"idx":1.3},{"label":"horse-racing / equestrian events","verb":"follow","pct":9,"idx":1.1},{"label":"ice hockey","verb":"follow","pct":22,"idx":1.1},{"label":"long-distance running","verb":"follow","pct":7,"idx":1.6},{"label":"martial arts","verb":"follow","pct":31,"idx":1.9},{"label":"motor sports (e.g. F1)","verb":"follow","pct":32,"idx":1.5},{"label":"netball","verb":"follow","pct":1,"idx":2.4},{"label":"polo","verb":"follow","pct":1,"idx":1.8},{"label":"rowing","verb":"follow","pct":3,"idx":1.4},{"label":"rugby","verb":"follow","pct":6,"idx":1.7},{"label":"sailing","verb":"follow","pct":4,"idx":1.4},{"label":"skateboarding","verb":"follow","pct":10,"idx":2.0},{"label":"soccer","verb":"follow","pct":49,"idx":1.5},{"label":"surfing","verb":"follow","pct":8,"idx":1.7},{"label":"swimming / diving","verb":"follow","pct":24,"idx":1.5},{"label":"table tennis","verb":"follow","pct":7,"idx":2.0},{"label":"tennis","verb":"follow","pct":29,"idx":1.4},{"label":"triathlon","verb":"follow","pct":3,"idx":1.2},{"label":"volleyball","verb":"follow","pct":14,"idx":1.8},{"label":"winter sports","verb":"follow","pct":35,"idx":1.0},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":28,"idx":2.1},{"label":"squash","verb":"follow","pct":1,"idx":1.8},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":21,"idx":1.5},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":30,"idx":0.9}],"Food & drink":[{"label":"cooking","verb":"interest","pct":60,"idx":1.2},{"label":"eating out","verb":"interest","pct":57,"idx":1.1},{"label":"food & drink","verb":"interest","pct":63,"idx":1.2}],"Music & entertainment":[{"label":"music","verb":"interest","pct":70,"idx":1.2},{"label":"films / cinema","verb":"interest","pct":47,"idx":1.2}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":40,"idx":1.0},{"label":"cars / motoring","verb":"interest","pct":28,"idx":1.4},{"label":"charities / volunteering","verb":"interest","pct":24,"idx":1.2},{"label":"DIY / home improvements","verb":"interest","pct":39,"idx":1.2},{"label":"fashion","verb":"interest","pct":35,"idx":2.1},{"label":"fitness & exercise","verb":"interest","pct":47,"idx":1.1},{"label":"pets / pet care","verb":"interest","pct":47,"idx":1.3},{"label":"skincare","verb":"interest","pct":44,"idx":1.5}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":24,"idx":1.4},{"label":"museums / galleries","verb":"interest","pct":36,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":42,"idx":1.2},{"label":"travel","verb":"interest","pct":49,"idx":1.0}]}},"Japan":{"region":"APAC","topics":{"Sports":[{"label":"sports fan","verb":"fan","pct":19,"idx":2.5},{"label":"American football","verb":"follow","pct":6,"idx":2.0},{"label":"athletics","verb":"follow","pct":22,"idx":1.3},{"label":"badminton","verb":"follow","pct":8,"idx":2.0},{"label":"baseball","verb":"follow","pct":48,"idx":1.2},{"label":"basketball","verb":"follow","pct":21,"idx":2.1},{"label":"boxing","verb":"follow","pct":15,"idx":1.8},{"label":"cricket","verb":"follow","pct":1,"idx":3.0},{"label":"cycling","verb":"follow","pct":7,"idx":1.8},{"label":"field hockey","verb":"follow","pct":0,"idx":2.0},{"label":"golf","verb":"follow","pct":15,"idx":1.4},{"label":"gymnastics","verb":"follow","pct":7,"idx":1.3},{"label":"horse-racing / equestrian events","verb":"follow","pct":9,"idx":1.7},{"label":"ice hockey","verb":"follow","pct":2,"idx":1.9},{"label":"long-distance running","verb":"follow","pct":12,"idx":1.1},{"label":"martial arts","verb":"follow","pct":12,"idx":2.5},{"label":"motor sports (e.g. F1)","verb":"follow","pct":15,"idx":1.6},{"label":"netball","verb":"follow","pct":1,"idx":2.5},{"label":"polo","verb":"follow","pct":1,"idx":2.5},{"label":"rowing","verb":"follow","pct":2,"idx":2.5},{"label":"rugby","verb":"follow","pct":12,"idx":1.2},{"label":"sailing","verb":"follow","pct":1,"idx":1.8},{"label":"skateboarding","verb":"follow","pct":4,"idx":2.6},{"label":"soccer","verb":"follow","pct":45,"idx":1.5},{"label":"surfing","verb":"follow","pct":3,"idx":2.7},{"label":"swimming / diving","verb":"follow","pct":15,"idx":1.5},{"label":"table tennis","verb":"follow","pct":12,"idx":1.3},{"label":"tennis","verb":"follow","pct":19,"idx":1.7},{"label":"triathlon","verb":"follow","pct":2,"idx":1.9},{"label":"volleyball","verb":"follow","pct":15,"idx":1.6},{"label":"winter sports","verb":"follow","pct":33,"idx":1.3},{"label":"wrestling (e.g. WWE)","verb":"follow","pct":6,"idx":2.0},{"label":"squash","verb":"follow","pct":1,"idx":2.0},{"label":"FIFA World Cup (Men's)","verb":"follow","pct":30,"idx":1.4},{"label":"Winter Olympics / Paralympics","verb":"follow","pct":30,"idx":1.2}],"Food & drink":[{"label":"cooking","verb":"interest","pct":39,"idx":1.4},{"label":"eating out","verb":"interest","pct":35,"idx":1.4},{"label":"food & drink","verb":"interest","pct":32,"idx":1.5}],"Music & entertainment":[{"label":"music","verb":"interest","pct":58,"idx":1.5},{"label":"films / cinema","verb":"interest","pct":48,"idx":1.3}],"Lifestyle & hobbies":[{"label":"books / literature","verb":"interest","pct":25,"idx":1.0},{"label":"cars / motoring","verb":"interest","pct":22,"idx":1.3},{"label":"charities / volunteering","verb":"interest","pct":7,"idx":1.5},{"label":"DIY / home improvements","verb":"interest","pct":14,"idx":1.3},{"label":"fashion","verb":"interest","pct":34,"idx":1.7},{"label":"fitness & exercise","verb":"interest","pct":22,"idx":1.5},{"label":"pets / pet care","verb":"interest","pct":22,"idx":1.7},{"label":"skincare","verb":"interest","pct":32,"idx":1.6}],"Travel & culture":[{"label":"fine art","verb":"interest","pct":20,"idx":1.1},{"label":"museums / galleries","verb":"interest","pct":21,"idx":1.0},{"label":"outdoor activities","verb":"interest","pct":20,"idx":1.7},{"label":"travel","verb":"interest","pct":51,"idx":1.2}]}}};
+
+const REGION_ORDER = ['Global','AMS','EU','APAC','METAP'];
+const REGION_LABELS = {Global:'Global',AMS:'Americas',EU:'Europe',APAC:'Asia-Pacific',METAP:'Middle East, Turkey & Africa'};
+const REGION_DOT = {Global:'dot-global',AMS:'dot-ams',EU:'dot-eu',APAC:'dot-apac',METAP:'dot-metap'};
+const TOPICS = ['Sports','Food & drink','Music & entertainment','Lifestyle & hobbies','Travel & culture'];
+
+let currentMarket = 'Global';
+let currentTopic = 'all';
+let currentSort = 'default';
+let currentSearch = '';
+
+function buildSidebar() {
+  const grouped = {};
+  Object.entries(DATA).forEach(([m, v]) => {
+    const r = v.region;
+    if (!grouped[r]) grouped[r] = [];
+    grouped[r].push(m);
+  });
+  Object.values(grouped).forEach(arr => arr.sort((a,b) => {
+    if(a==='Global') return -1;
+    if(b==='Global') return 1;
+    return a.localeCompare(b);
+  }));
+
+  const container = document.getElementById('market-list');
+  REGION_ORDER.forEach(region => {
+    const markets = grouped[region] || [];
+    if (!markets.length) return;
+    const grp = document.createElement('div');
+    grp.className = 'region-group';
+    grp.innerHTML = `<div class="region-header"><span class="region-dot ${REGION_DOT[region]}"></span>${REGION_LABELS[region]}</div>`;
+    markets.forEach(m => {
+      const btn = document.createElement('button');
+      btn.className = 'market-btn' + (m === currentMarket ? ' active' : '');
+      btn.textContent = m;
+      btn.dataset.market = m;
+      btn.addEventListener('click', () => selectMarket(m));
+      grp.appendChild(btn);
+    });
+    container.appendChild(grp);
+  });
+}
+
+function selectMarket(market) {
+  currentMarket = market;
+  document.querySelectorAll('.market-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.market === market);
+  });
+  currentTopic = 'all';
+  document.querySelectorAll('.topic-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.topic === 'all');
+  });
+  document.getElementById('search-input').value = '';
+  currentSearch = '';
+  render();
+}
+
+function capFirst(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function buildSentence(item) {
+  const label = item.label;
+  let verb;
+  if (item.verb === 'fan') verb = `I'm a ${label}`;
+  else if (item.verb === 'interest') verb = `I'm interested in ${label}`;
+  else verb = `I follow ${label}`;
+
+  const idxStr = item.idx >= 1.05
+    ? `${item.idx.toFixed(1)}x more likely than non-users`
+    : item.idx <= 0.95
+    ? `${item.idx.toFixed(1)}x less likely than non-users`
+    : 'on par with non-users';
+
+  return `${item.pct}% of TikTok users say: ${verb}. TikTok users are ${idxStr}.`;
+}
+
+function badgeFor(idx) {
+  if (idx >= 1.05) return {cls:'badge-more', text:`↑ ${idx.toFixed(1)}x more likely than non-users`};
+  if (idx <= 0.95) return {cls:'badge-less', text:`↓ ${idx.toFixed(1)}x less likely than non-users`};
+  return {cls:'badge-par', text:'≈ On par with non-users'};
+}
+
+function getItems(marketData) {
+  let items = [];
+  const topics = currentTopic === 'all' ? TOPICS : [currentTopic];
+  topics.forEach(t => {
+    (marketData.topics[t] || []).forEach(i => items.push({...i, topic: t}));
+  });
+
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    items = items.filter(i => i.label.toLowerCase().includes(q));
+  }
+
+  if (currentSort === 'pct-desc') items.sort((a,b) => b.pct - a.pct);
+  else if (currentSort === 'pct-asc') items.sort((a,b) => a.pct - b.pct);
+  else if (currentSort === 'index-desc') items.sort((a,b) => b.idx - a.idx);
+
+  return items;
+}
+
+function render() {
+  const marketData = DATA[currentMarket];
+  if (!marketData) return;
+
+  document.getElementById('about-panel').classList.remove('visible');
+  document.getElementById('data-view').style.display = 'block';
+  document.getElementById('about-btn').classList.remove('active');
+
+  // Update hero
+  document.getElementById('market-name').textContent = currentMarket;
+  const region = marketData.region;
+  document.getElementById('region-dot').className = 'region-dot ' + (REGION_DOT[region] || 'dot-global');
+  document.getElementById('region-label').textContent = REGION_LABELS[region] || region;
+
+  const items = getItems(marketData);
+  document.getElementById('results-count').textContent = `${items.length} stat${items.length !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('stats-grid');
+
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty">No stats found. Try a different filter or search term.</div>';
+    return;
+  }
+
+  let html = '';
+  if (currentSort === 'default') {
+    const topics = currentTopic === 'all' ? TOPICS : [currentTopic];
+    topics.forEach(topic => {
+      const topicItems = items.filter(i => i.topic === topic);
+      if (!topicItems.length) return;
+      html += `<div class="section-divider">
+        <span class="section-divider-label">${topic}</span>
+        <span class="section-divider-line"></span>
+        <span class="section-count">${topicItems.length}</span>
+      </div>`;
+      topicItems.forEach(item => { html += cardHtml(item, topic); });
+    });
+  } else {
+    items.forEach(item => { html += cardHtml(item, item.topic); });
+  }
+
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('.stat-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const sentence = card.dataset.sentence;
+      navigator.clipboard.writeText(sentence).then(() => {
+        const t = document.getElementById('toast');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 1800);
+      });
+    });
+  });
+}
+
+function cardHtml(item, topic) {
+  const badge = badgeFor(item.idx);
+  const sentence = buildSentence(item).replace(/"/g,'&quot;');
+  return `<div class="stat-card" data-sentence="${buildSentence(item)}">
+    <div class="copy-hint">Click to copy</div>
+    <div class="stat-label">${capFirst(item.label)}</div>
+    <div class="stat-pct-row">
+      <span class="stat-pct">${item.pct}</span>
+      <span class="stat-pct-suffix">%</span>
+    </div>
+    <div class="stat-sentence">${buildSentence(item)}</div>
+    <span class="stat-badge ${badge.cls}">${badge.text}</span>
+  </div>`;
+}
+
+// Topic tabs
+document.querySelectorAll('.topic-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    currentTopic = tab.dataset.topic;
+    document.querySelectorAll('.topic-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    render();
+  });
+});
+
+// Sort
+document.getElementById('sort-select').addEventListener('change', e => {
+  currentSort = e.target.value;
+  render();
+});
+
+// Search
+document.getElementById('search-input').addEventListener('input', e => {
+  currentSearch = e.target.value.trim();
+  render();
+});
+
+function toggleAbout() {
+  const panel = document.getElementById('about-panel');
+  const dataView = document.getElementById('data-view');
+  const btn = document.getElementById('about-btn');
+  const isVisible = panel.classList.contains('visible');
+  if (isVisible) {
+    panel.classList.remove('visible');
+    dataView.style.display = 'block';
+    btn.classList.remove('active');
+  } else {
+    panel.classList.add('visible');
+    dataView.style.display = 'none';
+    btn.classList.add('active');
+    document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+  }
+}
+
+buildSidebar();
+toggleAbout();
+</script>
+</body>
+</html>
